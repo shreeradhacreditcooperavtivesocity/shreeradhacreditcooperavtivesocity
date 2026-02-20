@@ -1,70 +1,406 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="hi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shree Radha Credit Co-operative Society</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-    }
-    header {
-      background-color: #6a1b9a;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    nav {
-      background-color: #8e24aa;
-      padding: 10px;
-      text-align: center;
-    }
-    nav a {
-      color: white;
-      margin: 0 15px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .container {
-      padding: 30px;
-      max-width: 1000px;
-      margin: auto;
-      background-color: white;
-    }
-    footer {
-      background-color: #6a1b9a;
-      color: white;
-      text-align: center;
-      padding: 15px;
-      margin-top: 40px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>SRCCS – Agent Transaction Entry</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<style>
+:root{
+  --primary:#1a237e;
+  --primary-dark:#0d154f;
+  --bg:#eef2f7;
+  --border:#c5cae9;
+  --success:#2e7d32;
+  --danger:#c62828;
+}
+
+*{
+  box-sizing:border-box;
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  font-size:13px;
+}
+
+.app{
+  max-width:420px;
+  margin:20px auto;
+  padding:12px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--border);
+  padding:16px;
+}
+
+/* ===== HEADER ===== */
+h2{
+  text-align:center;
+  margin:0 0 4px;
+  font-size:16px;
+  font-weight:bold;
+  color:var(--primary);
+}
+
+p{
+  text-align:center;
+  margin:0 0 14px;
+  font-size:11px;
+  color:#444;
+}
+
+/* ===== FORM ===== */
+label{
+  font-size:11px;
+  font-weight:bold;
+  margin-top:10px;
+  display:block;
+}
+
+input,select{
+  width:100%;
+  padding:7px 6px;
+  margin-top:4px;
+  font-size:13px;
+  border:1px solid var(--primary);
+  background:#fff;
+}
+
+input[readonly]{
+  background:#f3f4f9;
+}
+
+button{
+  width:100%;
+  margin-top:16px;
+  padding:9px;
+  font-size:13px;
+  font-weight:bold;
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  cursor:pointer;
+}
+
+button:hover{
+  background:var(--primary-dark);
+}
+
+/* ===== MESSAGE ===== */
+.msg{
+  text-align:center;
+  font-size:12px;
+  font-weight:bold;
+  margin-top:8px;
+}
+
+.ok{color:var(--success)}
+.err{color:var(--danger)}
+
+/* ===== LOCATION ===== */
+.loc-ok{
+  color:var(--success);
+  font-size:11px;
+  font-weight:bold;
+}
+
+.loc-wait{
+  color:var(--danger);
+  font-size:11px;
+  font-weight:bold;
+}
+
+/* ===== VERIFY TICK ===== */
+.verify-wrap{position:relative}
+
+.verify-tick{
+  position:absolute;
+  right:6px;
+  top:55%;
+  transform:translateY(-50%);
+  font-size:11px;
+  color:var(--success);
+  font-weight:bold;
+  display:none;
+}
+
+/* ===== HISTORY ===== */
+.history-box{
+  margin-top:16px;
+  border-top:1px solid var(--border);
+  padding-top:10px;
+}
+
+.history-box h4{
+  text-align:center;
+  font-size:13px;
+  margin-bottom:8px;
+  color:var(--primary);
+}
+
+.total-box{
+  text-align:center;
+  font-size:12px;
+  font-weight:bold;
+  margin-bottom:8px;
+}
+
+.history-item{
+  border-bottom:1px solid var(--border);
+  padding:6px 0;
+  font-size:12px;
+}
+
+.h-credit{
+  color:var(--success);
+  font-weight:bold;
+}
+
+.h-debit{
+  color:var(--danger);
+  font-weight:bold;
+}
+
+.small{
+  font-size:10px;
+  color:#555;
+}
+</style>
 </head>
+
 <body>
-  <header>
-    <h1>Shree Radha Credit Co-operative Society</h1>
-    <p>Your Trust, Our Commitment</p>
-  </header>  <nav>
-    <a href="#">Home</a>
-    <a href="#about">About Us</a>
-    <a href="#services">Services</a>
-    <a href="#join">Join Us</a>
-    <a href="#contact">Contact</a>
-  </nav>  <div class="container">
-    <h2>Welcome to Shree Radha Credit Co-operative Society</h2>
-    <p>
-      We are committed to providing secure and reliable financial services to our members. Our goal is to empower communities through savings, credit, and cooperative values.
-    </p>
-    <h3>Our Services</h3>
-    <ul>
-      <li>Fixed Deposit Schemes</li>
-      <li>Recurring Deposit</li>
-      <li>Loan Services</li>
-      <li>Member Support</li>
-    </ul>
-  </div>  <footer>
-    <p>© 2025 Shree Radha Credit Co-operative Society. All rights reserved.</p>
-  </footer>
+<div class="app">
+<div class="card">
+
+<h2>Agent Daily Entry</h2>
+<p>Shree Radha Credit Co-operative Society</p>
+
+<label>Account Number</label>
+<input id="account" placeholder="SRC1234">
+
+<label>Customer Name</label>
+<div class="verify-wrap">
+  <input id="name" readonly>
+  <div id="tick" class="verify-tick">✔ Verified</div>
+</div>
+
+<label>Transaction Type</label>
+<select id="type">
+  <option value="credit">Credit</option>
+  <option value="debit">Debit</option>
+</select>
+
+<label>Amount</label>
+<input id="amount" type="number">
+
+<label>Agent ID</label>
+<select id="agent">
+  <option value="">Select</option>
+  <option>SH7333</option>
+  <option>KA4564</option>
+  <option>JE2659</option>
+  <option>SRCCS1432</option>
+</select>
+
+<label>Mode</label>
+<select id="mode">
+  <option>Cash</option>
+  <option>UPI</option>
+  <option>Cheque</option>
+</select>
+
+<label>Location Status</label>
+<div id="locStatus" class="loc-wait">Detecting location…</div>
+
+<label>Remarks</label>
+<input id="remarks">
+
+<button onclick="saveEntry()">SAVE ENTRY</button>
+<div id="msg" class="msg"></div>
+
+<div class="history-box">
+  <h4>Transaction History (Last 24 Hours)</h4>
+  <div class="total-box" id="totalBox">Total Collection: ₹0</div>
+  <div id="historyList"></div>
+</div>
+
+</div>
+</div>
+
+<script>
+/* ===== ORIGINAL JS (UNCHANGED) ===== */
+const API="https://script.google.com/macros/s/AKfycbxuWtWOZ02G8qgn3ghIrqxbpvRlt6uMTEiO0IlDA5_KePadcfXHiBxqIWGYCExKTZZMVg/exec";
+const EXPIRY=24*60*60*1000;
+
+const account=document.getElementById("account");
+const name=document.getElementById("name");
+const tick=document.getElementById("tick");
+const msg=document.getElementById("msg");
+const amount=document.getElementById("amount");
+const type=document.getElementById("type");
+const agent=document.getElementById("agent");
+const mode=document.getElementById("mode");
+const remarks=document.getElementById("remarks");
+const historyList=document.getElementById("historyList");
+const totalBox=document.getElementById("totalBox");
+const locStatus=document.getElementById("locStatus");
+
+let t=null;
+let CURRENT_LOCATION=null;
+
+function initLocation(){
+  const cached = localStorage.getItem("SRCCS_LOCATION");
+  if(cached){
+    CURRENT_LOCATION=cached;
+    locStatus.innerText="Location detected ✔";
+    locStatus.className="loc-ok";
+  }
+
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      pos=>{
+        const fresh=`Lat:${pos.coords.latitude.toFixed(6)}, Lng:${pos.coords.longitude.toFixed(6)}`;
+        CURRENT_LOCATION=fresh;
+        localStorage.setItem("SRCCS_LOCATION",fresh);
+        locStatus.innerText="Location detected ✔";
+        locStatus.className="loc-ok";
+      },
+      ()=>{
+        if(!cached){
+          locStatus.innerText="❌ Location required";
+          locStatus.className="loc-wait";
+        }
+      },
+      {enableHighAccuracy:true,maximumAge:0,timeout:10000}
+    );
+  }
+}
+
+window.onload=()=>{
+  initLocation();
+  showHistory();
+};
+
+account.addEventListener("input",()=>{
+  clearTimeout(t);
+  t=setTimeout(fetchName,400);
+});
+
+function fetchName(){
+  let acc=account.value.trim();
+  if(!acc)return;
+  if(!acc.startsWith("SRC")) acc="SRC"+acc;
+  account.value=acc;
+
+  fetch(`${API}?fn=getName&account=${acc}`)
+    .then(r=>r.json())
+    .then(d=>{
+      if(d.success){
+        name.value=d.name;
+        tick.style.display="block";
+      }else{
+        name.value="";
+        tick.style.display="none";
+      }
+    });
+}
+
+function cleanOld(){
+  let h=JSON.parse(localStorage.getItem("SRCCS_HISTORY")||"{}");
+  let now=Date.now();
+  Object.keys(h).forEach(a=>{
+    h[a]=h[a].filter(x=>now-x.time<EXPIRY);
+    if(!h[a].length) delete h[a];
+  });
+  localStorage.setItem("SRCCS_HISTORY",JSON.stringify(h));
+}
+
+function showHistory(){
+  cleanOld();
+  let h=JSON.parse(localStorage.getItem("SRCCS_HISTORY")||"{}");
+  let all=[],total=0;
+
+  Object.values(h).forEach(arr=>{
+    arr.forEach(x=>{
+      all.push(x);
+      if(x.type==="credit") total+=Number(x.amount);
+    });
+  });
+
+  all.sort((a,b)=>b.time-a.time);
+  historyList.innerHTML="";
+
+  all.forEach(x=>{
+    historyList.innerHTML+=`
+      <div class="history-item">
+        <b>${x.name}</b> (${x.account})<br>
+        <span class="${x.type==="credit"?"h-credit":"h-debit"}">
+          ${x.type.toUpperCase()} ₹${x.amount}
+        </span><br>
+        <span class="small">${new Date(x.time).toLocaleString()} | Agent:${x.agent}</span>
+      </div>`;
+  });
+
+  totalBox.innerText="Total Collection: ₹"+total;
+}
+
+function saveEntry(){
+  if(!CURRENT_LOCATION){
+    msg.innerText="❌ Location not detected";
+    msg.className="msg err";
+    return;
+  }
+  if(!account.value||!amount.value||!agent.value){
+    msg.innerText="❌ Required fields missing";
+    msg.className="msg err";
+    return;
+  }
+
+  fetch(API,{
+    method:"POST",
+    mode:"no-cors",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      action:"addLedger",
+      account:account.value,
+      amount:amount.value,
+      type:type.value,
+      agent:agent.value,
+      mode:mode.value,
+      remarks:remarks.value,
+      location:CURRENT_LOCATION
+    })
+  })
+  .then(()=>{
+    let h=JSON.parse(localStorage.getItem("SRCCS_HISTORY")||"{}");
+    if(!h[account.value]) h[account.value]=[];
+    h[account.value].push({
+      account:account.value,
+      name:name.value,
+      amount:amount.value,
+      type:type.value,
+      agent:agent.value,
+      mode:mode.value,
+      remarks:remarks.value,
+      time:Date.now()
+    });
+    localStorage.setItem("SRCCS_HISTORY",JSON.stringify(h));
+
+    msg.innerText="✔ Entry Saved";
+    msg.className="msg ok";
+
+    setTimeout(()=>location.reload(),800);
+  })
+  .catch(()=>{
+    msg.innerText="❌ Network error";
+    msg.className="msg err";
+  });
+}
+</script>
 </body>
 </html>
