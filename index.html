@@ -5,7 +5,22 @@
 <title>SRCCS – Agent Transaction Entry</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
+<script>
+/* ===== PASSWORD PROTECTION ===== */
+const PAGE_PASSWORD = "R@1234";   // 👉 Yaha apna password set kare
+
+(function(){
+  const entered = prompt("Enter Password to Open Page:");
+  if(entered !== PAGE_PASSWORD){
+    document.write("<h2 style='text-align:center;margin-top:100px;color:red;'>Access Denied ❌</h2>");
+    throw new Error("Wrong Password");
+  }
+})();
+</script>
+
 <style>
+/* ===== AAPKA PURA ORIGINAL CSS YAHA SAME RAHEGA ===== */
+
 :root{
   --primary:#1a237e;
   --primary-dark:#0d154f;
@@ -99,7 +114,21 @@ button:hover{
   margin-top:8px;
 }
 
-.ok{color:var(--success)}
+/* SUCCESS MESSAGE */
+.msg-success{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  color:var(--success);
+  font-size:13px;
+  font-weight:bold;
+  margin-top:10px;
+}
+
+.msg-success span{
+  font-size:16px;
+}
 .err{color:var(--danger)}
 
 /* ===== LOCATION ===== */
@@ -170,10 +199,68 @@ button:hover{
   font-size:10px;
   color:#555;
 }
+
+/* LOADER */
+/* OVERLAY */
+.loader-overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(255,255,255,0.8);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+/* CENTER BOX */
+#loaderContent{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+}
+
+/* SPINNER */
+.loader{
+  border:6px solid #f3f3f3;
+  border-top:6px solid #1a237e;
+  border-radius:50%;
+  width:60px;
+  height:60px;
+  animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+  0%{transform:rotate(0deg);}
+  100%{transform:rotate(360deg);}
+}
+
+/* SUCCESS TICK */
+.success-tick{
+  display:none;
+  font-size:70px;
+  color:#2e7d32;
+  font-weight:bold;
+  animation:pop 0.3s ease-in-out;
+}
+
+@keyframes pop{
+  0%{transform:scale(0);}
+  100%{transform:scale(1);}
+}
 </style>
 </head>
 
 <body>
+  <div class="loader-overlay" id="loader">
+  <div id="loaderContent">
+    <div class="loader" id="spinner"></div>
+    <div class="success-tick" id="successTick">✔</div>
+  </div>
+</div>
 <div class="app">
 <div class="card">
 
@@ -220,7 +307,7 @@ button:hover{
 <label>Remarks</label>
 <input id="remarks">
 
-<button onclick="saveEntry()">SAVE ENTRY</button>
+<button id="saveBtn" onclick="saveEntry()">SAVE ENTRY</button>
 <div id="msg" class="msg"></div>
 
 <div class="history-box">
@@ -231,11 +318,8 @@ button:hover{
 
 </div>
 </div>
-
 <script>
-/* ===== ORIGINAL JS (UNCHANGED) ===== */
 const API="https://script.google.com/macros/s/AKfycbxuWtWOZ02G8qgn3ghIrqxbpvRlt6uMTEiO0IlDA5_KePadcfXHiBxqIWGYCExKTZZMVg/exec";
-const EXPIRY=24*60*60*1000;
 
 const account=document.getElementById("account");
 const name=document.getElementById("name");
@@ -249,34 +333,25 @@ const remarks=document.getElementById("remarks");
 const historyList=document.getElementById("historyList");
 const totalBox=document.getElementById("totalBox");
 const locStatus=document.getElementById("locStatus");
+const saveBtn=document.getElementById("saveBtn");
+const loader=document.getElementById("loader");
 
 let t=null;
 let CURRENT_LOCATION=null;
 
+/* ================= LOCATION ================= */
 function initLocation(){
-  const cached = localStorage.getItem("SRCCS_LOCATION");
-  if(cached){
-    CURRENT_LOCATION=cached;
-    locStatus.innerText="Location detected ✔";
-    locStatus.className="loc-ok";
-  }
-
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(
       pos=>{
-        const fresh=`Lat:${pos.coords.latitude.toFixed(6)}, Lng:${pos.coords.longitude.toFixed(6)}`;
-        CURRENT_LOCATION=fresh;
-        localStorage.setItem("SRCCS_LOCATION",fresh);
+        CURRENT_LOCATION=`Lat:${pos.coords.latitude.toFixed(6)}, Lng:${pos.coords.longitude.toFixed(6)}`;
         locStatus.innerText="Location detected ✔";
         locStatus.className="loc-ok";
       },
       ()=>{
-        if(!cached){
-          locStatus.innerText="❌ Location required";
-          locStatus.className="loc-wait";
-        }
-      },
-      {enableHighAccuracy:true,maximumAge:0,timeout:10000}
+        locStatus.innerText="❌ Location required";
+        locStatus.className="loc-wait";
+      }
     );
   }
 }
@@ -286,6 +361,7 @@ window.onload=()=>{
   showHistory();
 };
 
+/* ================= FETCH NAME ================= */
 account.addEventListener("input",()=>{
   clearTimeout(t);
   t=setTimeout(fetchName,400);
@@ -294,6 +370,7 @@ account.addEventListener("input",()=>{
 function fetchName(){
   let acc=account.value.trim();
   if(!acc)return;
+
   if(!acc.startsWith("SRC")) acc="SRC"+acc;
   account.value=acc;
 
@@ -310,18 +387,8 @@ function fetchName(){
     });
 }
 
-function cleanOld(){
-  let h=JSON.parse(localStorage.getItem("SRCCS_HISTORY")||"{}");
-  let now=Date.now();
-  Object.keys(h).forEach(a=>{
-    h[a]=h[a].filter(x=>now-x.time<EXPIRY);
-    if(!h[a].length) delete h[a];
-  });
-  localStorage.setItem("SRCCS_HISTORY",JSON.stringify(h));
-}
-
+/* ================= HISTORY ================= */
 function showHistory(){
-  cleanOld();
   let h=JSON.parse(localStorage.getItem("SRCCS_HISTORY")||"{}");
   let all=[],total=0;
 
@@ -349,17 +416,35 @@ function showHistory(){
   totalBox.innerText="Total Collection: ₹"+total;
 }
 
+
+/* ================= SAVE ENTRY ================= */
 function saveEntry(){
+
   if(!CURRENT_LOCATION){
     msg.innerText="❌ Location not detected";
     msg.className="msg err";
     return;
   }
+
+  if(!name.value){
+    msg.innerText="❌ Account not verified";
+    msg.className="msg err";
+    return;
+  }
+
   if(!account.value||!amount.value||!agent.value){
     msg.innerText="❌ Required fields missing";
     msg.className="msg err";
     return;
   }
+
+  const spinner=document.getElementById("spinner");
+  const successTick=document.getElementById("successTick");
+
+  loader.style.display="flex";
+  spinner.style.display="block";
+  successTick.style.display="none";
+  saveBtn.disabled=true;
 
   fetch(API,{
     method:"POST",
@@ -377,6 +462,14 @@ function saveEntry(){
     })
   })
   .then(()=>{
+
+    /* SPINNER HIDE */
+    spinner.style.display="none";
+
+    /* SHOW GREEN TICK */
+    successTick.style.display="block";
+
+    /* LOCAL HISTORY UPDATE */
     let h=JSON.parse(localStorage.getItem("SRCCS_HISTORY")||"{}");
     if(!h[account.value]) h[account.value]=[];
     h[account.value].push({
@@ -391,12 +484,22 @@ function saveEntry(){
     });
     localStorage.setItem("SRCCS_HISTORY",JSON.stringify(h));
 
-    msg.innerText="✔ Entry Saved";
-    msg.className="msg ok";
+    setTimeout(()=>{
+      loader.style.display="none";
+      saveBtn.disabled=false;
 
-    setTimeout(()=>location.reload(),800);
+      account.value="";
+      name.value="";
+      amount.value="";
+      remarks.value="";
+      tick.style.display="none";
+      showHistory();
+    },1200);
+
   })
   .catch(()=>{
+    loader.style.display="none";
+    saveBtn.disabled=false;
     msg.innerText="❌ Network error";
     msg.className="msg err";
   });
