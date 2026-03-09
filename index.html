@@ -7,14 +7,24 @@
 
 <script>
 /* ===== PASSWORD PROTECTION ===== */
-const PAGE_PASSWORD = "1234";   // 👉 Yaha apna password set kare
+const PAGE_PASSWORD = "1432";   // password
 
 (function(){
+
+  // Hide page first
+  document.documentElement.style.display="none";
+
   const entered = prompt("Enter Password to Open Page:");
-  if(entered !== PAGE_PASSWORD){
-    document.write("<h2 style='text-align:center;margin-top:100px;color:red;'>Access Denied ❌</h2>");
-    throw new Error("Wrong Password");
+
+  if(entered === PAGE_PASSWORD){
+      // Correct password → show page
+      document.documentElement.style.display="block";
+  }else{
+      // Wrong password → blank page
+      document.body.innerHTML="";
+      throw new Error("Access Denied");
   }
+
 })();
 </script>
 
@@ -320,6 +330,18 @@ button:hover{
 </div>
 </div>
 <script>
+  /* ===== AUTO RESET NEXT DAY ===== */
+function checkDateReset(){
+
+  const today=new Date().toDateString();
+  const savedDate=localStorage.getItem("SRCCS_DATE");
+
+  if(savedDate!==today){
+      localStorage.removeItem("SRCCS_HISTORY");
+      localStorage.setItem("SRCCS_DATE",today);
+  }
+
+}
 const API="https://script.google.com/macros/s/AKfycbxuWtWOZ02G8qgn3ghIrqxbpvRlt6uMTEiO0IlDA5_KePadcfXHiBxqIWGYCExKTZZMVg/exec";
 
 const account=document.getElementById("account");
@@ -358,6 +380,7 @@ function initLocation(){
 }
 
 window.onload=()=>{
+  checkDateReset();   // date change check
   initLocation();
   showHistory();
 };
@@ -508,4 +531,3 @@ function saveEntry(){
 </script>
 </body>
 </html>
-
