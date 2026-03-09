@@ -278,7 +278,13 @@ button:hover{
 <p>Shree Radha Credit Co-operative Society</p>
 
 <label>Account Number</label>
-<input id="account" placeholder="SRC1234">
+<input 
+id="account"
+value="SRC"
+inputmode="numeric"
+maxlength="7"
+oninput="formatAccount(this)"
+>
 
 <label>Customer Name</label>
 <div class="verify-wrap">
@@ -362,6 +368,17 @@ const loader=document.getElementById("loader");
 let t=null;
 let CURRENT_LOCATION=null;
 
+
+function formatAccount(el){
+
+  let v = el.value.replace(/[^0-9]/g,'');
+
+  if(v.length>4) v=v.slice(0,4);
+
+  el.value = "SRC" + v;
+
+}
+
 /* ================= LOCATION ================= */
 function initLocation(){
   if(navigator.geolocation){
@@ -392,11 +409,9 @@ account.addEventListener("input",()=>{
 });
 
 function fetchName(){
-  let acc=account.value.trim();
-  if(!acc)return;
+ let acc=account.value.trim();
 
-  if(!acc.startsWith("SRC")) acc="SRC"+acc;
-  account.value=acc;
+if(acc.length!==7) return;
 
   fetch(`${API}?fn=getName&account=${acc}`)
     .then(r=>r.json())
