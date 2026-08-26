@@ -1,1099 +1,919 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>SRCCS – Agent Transaction Entry</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-
-<script>
-/* ===== PASSWORD PROTECTION ===== */
-const PAGE_PASSWORD = "82259";   // password
-
-(function(){
-  document.documentElement.style.display="none";
-  const entered = prompt("Enter Password to Open Page:");
-  if(entered === PAGE_PASSWORD){
-      document.documentElement.style.display="block";
-  }else{
-      document.body.innerHTML="";
-      throw new Error("Access Denied");
-  }
-})();
-</script>
-
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#8B1538"/>
+<title>Shree Radha — Agent Collection</title>
 <style>
-/* =======================================================
-   DESIGN SYSTEM — "Diagnostic Console"
-   (based on Google Ad Manager / GPT console panel look)
-   Colors : --bar:#000000  --bg:#F1F3F4  --card:#FFFFFF
-            --blue:#4285F4  --orange:#FF6D2A
-            --text:#202124  --text-soft:#5F6368
-            --border:#E0E0E0  --green:#1B8A4C  --red:#D93025
-   Type   : Roboto (UI) + Roboto Mono (values/data)
-   ======================================================= */
+:root{--p:#8B1538;--pd:#6B0F2A;--sb:#5C0A28;--sba:#C2185B;--w:#fff;--bg:#F5F6FA;--cs:0 2px 8px rgba(0,0,0,.06);--t:#2D2D2D;--tm:#6B7280;--bd:#E5E7EB;--ok:#059669;--er:#DC2626}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--t);font-size:13px;min-height:100vh;-webkit-tap-highlight-color:transparent}
+.hidden{display:none!important}
 
-:root{
-  --bar:#0B0B0C;
-  --bg:#F1F3F4;
-  --card:#FFFFFF;
-  --blue:#4285F4;
-  --blue-dark:#1A56C4;
-  --orange:#FF6D2A;
-  --text:#202124;
-  --text-soft:#5F6368;
-  --text-faint:#9AA0A6;
-  --border:#E1E3E6;
-  --green:#1B8A4C;
-  --red:#D93025;
-  --warn:#F2A600;
+/* Login — match main CBS */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#5C0A28,#8B1538,#C2185B)}
+.login-box{background:#fff;border-radius:12px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 8px 28px rgba(0,0,0,.25)}
+.login-box .logo{text-align:center;margin-bottom:16px}
+.login-box .logo .li{width:56px;height:56px;margin:0 auto 8px;border-radius:10px;overflow:hidden;background:transparent}
+.login-box .logo .li img{width:100%;height:100%;object-fit:contain;display:block}
+.login-box h1{font-size:15px;color:var(--p);font-weight:700}
+.login-box .sub{font-size:10.5px;color:var(--tm);margin-top:2px}
+.fg{margin-bottom:10px}
+.fg label{display:block;font-size:11.5px;font-weight:600;color:var(--tm);margin-bottom:2px}
+.fg input{width:100%;height:40px;padding:4px 10px;border:1.5px solid #D1D5DB;border-radius:6px;font-size:14px;font-family:inherit}
+.fg input:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 2px rgba(139,21,56,.1)}
+.btn-login{width:100%;height:42px;border:none;border-radius:6px;background:var(--p);color:#fff;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;font-family:inherit}
+.btn-login:active{background:var(--pd)}
+.login-hint{text-align:center;margin-top:12px;font-size:10.5px;color:var(--tm)}
+
+/* Agent App */
+.agent-app{display:none;flex-direction:column;height:100vh;height:100dvh;background:var(--bg)}
+.agent-app.show{display:flex}
+.aa-top{background:linear-gradient(135deg,#5C0A28,#8B1538,#C2185B);color:#fff;padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top));flex-shrink:0}
+.aa-top .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.aa-top .brand-wrap{display:flex;align-items:center;gap:8px}
+.aa-top .brand-logo{width:36px;height:36px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.95);flex-shrink:0}
+.aa-top .brand-logo img{width:100%;height:100%;object-fit:contain;display:block}
+.aa-top .brand{font-weight:800;font-size:11.5px;line-height:1.15;letter-spacing:.2px}
+.aa-top .sub{font-size:10px;opacity:.88;margin-top:1px}
+.aa-top .av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px}
+.aa-top .icon-btn{background:rgba(255,255,255,.2);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer;position:relative}
+.aa-top .icon-btn .bdg{position:absolute;top:-2px;right:-2px;background:var(--er);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+
+.aa-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 10px 0;flex-shrink:0}
+.aa-stat{background:#fff;border-radius:8px;padding:8px 4px;text-align:center;box-shadow:var(--cs)}
+.aa-stat .v{font-size:13px;font-weight:800;color:var(--p)}
+.aa-stat .l{font-size:9px;color:var(--tm);margin-top:1px}
+
+.aa-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 10px 100px}
+.aa-card{background:#fff;border-radius:8px;padding:12px;margin-bottom:8px;box-shadow:var(--cs)}
+.aa-card h3{font-size:12px;color:var(--p);font-weight:700;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--bd)}
+.aa-field{margin-bottom:8px}
+.aa-field label{display:block;font-size:10.5px;font-weight:600;color:var(--tm);margin-bottom:2px}
+.aa-field label .rq{color:var(--er)}
+.aa-field input,.aa-field select,.aa-field textarea{
+  width:100%;height:40px;padding:6px 10px;border:1px solid #D1D5DB;border-radius:6px;
+  font-size:14px;font-family:inherit;background:#fff;-webkit-appearance:none
 }
-
-*{box-sizing:border-box;}
-
-body{
-  margin:0;
-  font-family:'Roboto',Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  font-size:13px;
-  padding-bottom:64px;
-}
-
-.mono{font-family:'Roboto Mono',monospace;}
-
-/* ===== TOP BAR ===== */
-.topbar{
-  background:var(--bar);
-  color:#fff;
-  display:flex;
-  align-items:center;
-  gap:14px;
-  padding:14px 16px;
-}
-
-.topbar .back{
-  font-size:20px;
-  line-height:1;
-  color:#fff;
-  background:none;
-  border:none;
-  width:auto;
-  margin:0;
-  padding:0 4px;
-  cursor:pointer;
-}
-
-.topbar .brand{
-  font-weight:900;
-  font-size:19px;
-  letter-spacing:-.01em;
-}
-
-.topbar .brand span{color:var(--blue);}
-
-/* ===== TAB BAR ===== */
-.tabbar{
-  background:#fff;
-  display:flex;
-  align-items:center;
-  border-bottom:1px solid var(--border);
-  padding:0 8px;
-}
-
-.tabbar .tab{
-  background:none;
-  border:none;
-  padding:13px 14px 11px;
-  font-size:13px;
-  font-weight:500;
-  color:var(--text-soft);
-  border-bottom:3px solid transparent;
-  margin:0;
-  width:auto;
-  cursor:pointer;
-}
-
-.tabbar .tab.active{
-  color:var(--blue);
-  font-weight:700;
-  border-bottom-color:var(--blue);
-}
-
-.tabbar .spacer{flex:1;}
-
-.tabbar .icon-btn{
-  width:auto;
-  background:none;
-  border:none;
-  font-size:16px;
-  color:var(--text-soft);
-  padding:6px 8px;
-  margin:0;
-  cursor:pointer;
-}
-
-/* ===== STATUS BANNER ===== */
-.banner{
-  background:var(--blue);
-  color:#fff;
-  text-align:center;
-  font-weight:700;
-  font-size:12px;
-  letter-spacing:.04em;
-  padding:11px 12px;
-  text-transform:uppercase;
-}
-
-.banner.save{
-  width:100%;
-  border:none;
-  cursor:pointer;
-  margin-top:18px;
-}
-
-.banner.save:disabled{opacity:.55;}
-.banner.save:active{background:var(--blue-dark);}
-
-/* ===== LAYOUT ===== */
-.app{
-  max-width:460px;
-  margin:0 auto;
-  padding:14px 12px 4px;
-}
-
-.panel{display:none;}
-.panel.active{display:block;}
-
-/* ===== NUMBERED CARD ===== */
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:8px;
-  margin-bottom:16px;
-  display:flex;
-  overflow:hidden;
-  box-shadow:0 1px 3px rgba(0,0,0,0.05);
-}
-
-.card .accent{
-  width:4px;
-  flex-shrink:0;
-}
-
-.card.c1 .accent{background:var(--blue);}
-.card.c2 .accent{background:var(--orange);}
-.card.c3 .accent{background:var(--blue);}
-
-.card-body{
-  padding:16px 16px 18px;
-  flex:1;
-  min-width:0;
-}
-
-.card-head{
-  display:flex;
-  gap:12px;
-  align-items:flex-start;
-  margin-bottom:14px;
-}
-
-.card-num{
-  font-size:22px;
-  font-weight:900;
-  color:var(--text-faint);
-  line-height:1;
-  flex-shrink:0;
-}
-
-.card-head-text{min-width:0;}
-
-.breadcrumb{
-  font-size:11px;
-  color:var(--text-faint);
-  margin-bottom:2px;
-}
-
-.card-title{
-  font-size:15px;
-  font-weight:700;
-  color:var(--blue-dark);
-}
-
-/* ===== FIELD ROW (key: value look) ===== */
-.row{
-  padding:9px 0;
-  border-bottom:1px solid #F0F1F2;
-}
-
-.row:last-child{border-bottom:none;}
-
-.row .k{
-  font-size:11.5px;
-  color:var(--text-soft);
-  display:block;
-  margin-bottom:4px;
-}
-
-.row input,
-.row select{
-  width:100%;
-  border:none;
-  border-bottom:1.5px solid transparent;
-  background:transparent;
-  padding:2px 0 4px;
-  font-family:'Roboto Mono',monospace;
-  font-weight:700;
-  font-size:14px;
-  color:var(--text);
-  border-radius:0;
-}
-
-.row select{font-family:'Roboto',sans-serif;font-weight:500;}
-
-.row input:focus,
-.row select:focus{
-  outline:none;
-  border-bottom-color:var(--blue);
-}
-
-.row .static-val{
-  font-family:'Roboto Mono',monospace;
-  font-weight:700;
-  font-size:13.5px;
-}
-
-.static-val.green{color:var(--green);}
-.static-val.red{color:var(--red);}
-.static-val.grey{color:var(--text-faint);}
-
-/* ===== WARNING BOX ===== */
-.warn-box{
-  display:none;
-  align-items:flex-start;
-  gap:8px;
-  background:#FFF8E5;
-  border:1px solid #F2DDA0;
-  border-radius:6px;
-  padding:10px 12px;
-  margin:6px 0 4px;
-  font-size:12px;
-  font-weight:500;
-  color:var(--text);
-}
-
-.warn-box.show{display:flex;}
-
-.warn-box .ic{
-  color:var(--warn);
-  font-size:14px;
-  flex-shrink:0;
-}
-
-.warn-box.error{
-  background:#FCE8E6;
-  border-color:#F3B4AE;
-}
-
-.warn-box.error .ic{color:var(--red);}
-
-/* ===== BUTTON GRID ===== */
-.btn-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-top:6px;
-}
-
-.btn-grid.single{grid-template-columns:1fr;}
-
-.pill-btn{
-  background:#F1F3F4;
-  border:1px solid var(--border);
-  color:var(--text);
-  font-weight:700;
-  font-size:12px;
-  padding:11px 10px;
-  border-radius:6px;
-  text-align:center;
-  cursor:pointer;
-  margin:0;
-  width:100%;
-}
-
-.pill-btn:active{background:#E4E6E8;}
-
-/* ===== SUB TABS (Daily/Monthly) ===== */
-.subtabs{
-  display:flex;
-  gap:8px;
-  margin-bottom:12px;
-}
-
-.subtab{
-  background:#F1F3F4;
-  border:1px solid var(--border);
-  color:var(--text-soft);
-  font-weight:700;
-  font-size:11.5px;
-  text-transform:uppercase;
-  letter-spacing:.03em;
-  padding:8px 14px;
-  border-radius:16px;
-  width:auto;
-  margin:0;
-  cursor:pointer;
-}
-
-.subtab.active{
-  background:var(--blue);
-  color:#fff;
-  border-color:var(--blue);
-}
-
-.date-controls{
-  display:flex;
-  gap:8px;
-  margin-bottom:14px;
-}
-
-.date-controls input{
-  flex:1;
-  border:1px solid var(--border);
-  border-radius:6px;
-  padding:9px;
-  font-family:'Roboto Mono',monospace;
-  font-size:12.5px;
-}
-
-.date-controls input:focus{outline:none;border-color:var(--blue);}
-
-.date-controls .pill-btn{width:auto;padding:9px 16px;}
-
-.report-net{
-  margin-top:4px;
-  padding-top:12px;
-  border-top:2px solid var(--text);
-  display:flex;
-  justify-content:space-between;
-  align-items:baseline;
-}
-
-.report-net .k{font-size:13px;font-weight:700;color:var(--text);}
-.report-net .v{font-family:'Roboto Mono',monospace;font-weight:900;font-size:20px;}
-
-/* ===== HISTORY LIST ===== */
-.hist-total{
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:14px 16px;
-  margin-bottom:12px;
-  font-weight:900;
-  font-size:16px;
-  font-family:'Roboto Mono',monospace;
-}
-
-.hist-item{
-  background:#fff;
-  border:1px solid var(--border);
-  border-left:4px solid var(--blue);
-  border-radius:6px;
-  padding:10px 12px;
-  margin-bottom:8px;
-  font-size:12.5px;
-}
-
-.hist-item.debit{border-left-color:var(--orange);}
-
-.hist-item .name-line{
-  font-weight:700;
-  margin-bottom:2px;
-}
-
-.hist-item .amt-line{
-  font-family:'Roboto Mono',monospace;
-  font-weight:700;
-}
-
-.hist-item .amt-line.credit{color:var(--green);}
-.hist-item .amt-line.debit{color:var(--red);}
-
-.hist-item .meta{
-  font-size:10.5px;
-  color:var(--text-faint);
-  margin-top:3px;
-}
-
-.empty-note{
-  text-align:center;
-  color:var(--text-faint);
-  font-size:12px;
-  padding:22px 10px;
-  font-style:italic;
-}
-
-/* ===== BOTTOM STICKY BAR ===== */
-.bottombar{
-  position:fixed;
-  left:0;right:0;bottom:0;
-  background:var(--bar);
-  color:#fff;
-  padding:13px 0 10px;
-  text-align:center;
-  cursor:pointer;
-  z-index:500;
-}
-
-.bottombar .grip{
-  width:36px;
-  height:4px;
-  background:rgba(255,255,255,0.35);
-  border-radius:3px;
-  margin:0 auto 8px;
-}
-
-.bottombar .label{
-  font-weight:700;
-  font-size:13px;
-  letter-spacing:.02em;
-}
-
-.bottombar .label b{color:var(--blue);font-family:'Roboto Mono',monospace;}
-
-/* ===== LOADER ===== */
-.loader-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(255,255,255,0.94);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-}
-
-#loaderContent{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:12px;
-}
-
-.loader{
-  border:4px solid var(--border);
-  border-top:4px solid var(--blue);
-  border-radius:50%;
-  width:44px;
-  height:44px;
-  animation:spin .8s linear infinite;
-}
-
-@keyframes spin{100%{transform:rotate(360deg);}}
-
-.success-tick{
-  display:none;
-  width:64px;
-  height:64px;
-  border-radius:50%;
-  background:var(--blue);
-  color:#fff;
-  font-size:30px;
-  font-weight:900;
-  align-items:center;
-  justify-content:center;
-  animation:pop .3s ease-out;
-}
-
-@keyframes pop{0%{transform:scale(0);}100%{transform:scale(1);}}
-
-.loader-caption{
-  font-size:12px;
-  font-weight:700;
-  color:var(--text-soft);
-  text-transform:uppercase;
-  letter-spacing:.05em;
-}
-
-/* ===== CONFIRM DIALOG ===== */
-.confirm-box{
-  background:var(--card);
-  border-radius:10px;
-  padding:20px 20px 18px;
-  width:88%;
-  max-width:360px;
-  box-shadow:0 8px 28px rgba(0,0,0,0.2);
-  animation:pop .18s ease-out;
-}
-
-.confirm-title{
-  font-size:15px;
-  font-weight:700;
-  color:var(--blue-dark);
-  margin-bottom:4px;
-  text-align:center;
-}
-
-.confirm-sub{
-  font-size:11.5px;
-  color:var(--text-soft);
-  text-align:center;
-  margin-bottom:14px;
-}
-
-.confirm-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  padding:8px 0;
-  border-bottom:1px solid #F0F1F2;
-  font-size:12.5px;
-}
-
-.confirm-row:last-of-type{border-bottom:none;}
-.confirm-row span{color:var(--text-soft);flex-shrink:0;}
-.confirm-row b{
-  font-family:'Roboto Mono',monospace;
-  color:var(--text);
-  font-size:13px;
-  text-align:right;
-  word-break:break-word;
-}
-
-.confirm-row.total b{color:var(--blue-dark);font-size:15px;font-weight:900;}
-
-.confirm-actions{
-  display:grid;
-  grid-template-columns:1fr 1.4fr;
-  gap:8px;
-  margin-top:16px;
-}
-
-.confirm-actions .banner.save{margin-top:0;border-radius:6px;}
+.aa-field textarea{height:70px;resize:vertical;line-height:1.35}
+.aa-field input:focus,.aa-field select:focus,.aa-field textarea:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 2px rgba(139,21,56,.1)}
+.aa-field input[readonly],.aa-field textarea[readonly]{background:#F3F4F6;color:#555}
+
+.aa-btn{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 14px;border-radius:6px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;width:100%}
+.aa-btn-p{background:var(--p);color:#fff}
+.aa-btn-p:active{background:var(--pd)}
+.aa-btn-o{background:#fff;color:var(--p);border:1.5px solid var(--p)}
+
+.aa-verify{display:none;padding:8px 10px;border-radius:6px;font-size:11.5px;margin-top:6px;line-height:1.4}
+.aa-verify.show{display:block}
+.aa-verify.ok{background:#D1FAE5;border:1px solid #A7F3D0;color:#065F46}
+.aa-verify.err{background:#FEE2E2;border:1px solid #FECACA;color:#991B1B}
+.aa-verify .grid{display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;margin-top:4px}
+.aa-verify .grid b{display:block;font-size:9px;text-transform:uppercase;opacity:.75}
+
+.aa-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.aa-chip{padding:7px 11px;border-radius:16px;font-size:11px;font-weight:600;border:1.5px solid var(--bd);background:#fff;color:#374151;cursor:pointer}
+.aa-chip.on{background:var(--p);color:#fff;border-color:var(--p)}
+
+.aa-bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--bd);padding:8px 10px calc(8px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1.5fr;gap:6px;z-index:50;box-shadow:0 -2px 12px rgba(0,0,0,.08)}
+.aa-list-item{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid #F0F0F0;font-size:12px;gap:8px}
+.aa-list-item .amt{font-weight:800;color:var(--p);white-space:nowrap}
+.aa-list-item .meta{font-size:10.5px;color:var(--tm)}
+.aa-list-item .nm{font-weight:700;font-size:12px}
+
+.aa-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--p);color:#fff;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:600;opacity:0;transition:all .2s;z-index:100;max-width:90%;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.aa-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.aa-tabs{display:flex;background:#fff;border-radius:8px;overflow:hidden;margin-bottom:8px;box-shadow:var(--cs)}
+.aa-tab{flex:1;padding:9px 4px;text-align:center;font-size:11px;font-weight:700;color:var(--tm);border:none;background:#fff;cursor:pointer}
+.aa-tab.on{color:var(--p);border-bottom:2px solid var(--p)}
+
+.aa-loan-box{background:#FFF8F9;border:1px solid #F8BBD0;border-radius:6px;padding:8px 10px;margin:6px 0;display:none;font-size:11.5px}
+.aa-loan-box.show{display:block}
+.aa-loan-box .row{display:flex;justify-content:space-between;padding:2px 0}
+
+/* Notifications panel */
+.aa-notif{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:90;display:none;align-items:flex-end;justify-content:center}
+.aa-notif.show{display:flex}
+.aa-notif-sheet{background:#fff;width:100%;max-width:480px;max-height:85vh;border-radius:14px 14px 0 0;overflow:hidden;display:flex;flex-direction:column}
+.aa-notif-head{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.aa-notif-head h2{font-size:14px;color:var(--p);font-weight:800}
+.aa-notif-head button{background:none;border:none;font-size:18px;color:var(--tm);cursor:pointer;padding:4px 8px}
+.aa-notif-body{overflow-y:auto;padding:10px 12px 20px;-webkit-overflow-scrolling:touch}
+.aa-sec{margin-bottom:12px}
+.aa-sec-h{font-size:11px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;padding:6px 8px;background:#FDF8F9;border-radius:6px;border-left:3px solid var(--p)}
+.aa-badge{display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:700;margin-left:4px}
+.aa-badge.ok{background:#D1FAE5;color:#065F46}
+.aa-badge.warn{background:#FEF3C7;color:#92400E}
+.aa-badge.er{background:#FEE2E2;color:#991B1B}
+.aa-badge.info{background:#DBEAFE;color:#1E40AF}
+.aa-empty{text-align:center;color:var(--tm);padding:12px;font-size:12px}
+
+@media(min-width:480px){.agent-app,.login-wrap{max-width:480px;margin:0 auto}.aa-bottom,.aa-notif-sheet{max-width:480px;left:50%;transform:translateX(-50%)}.aa-notif-sheet{transform:none;left:auto}}
+
+.aa-top .org{font-size:10px;opacity:.9;font-weight:600;margin-top:1px}
+.aa-row3{display:grid;grid-template-columns:1.2fr 0.9fr 0.9fr;gap:6px}
+.aa-row3 .aa-field{margin-bottom:0}
+.aa-prefix{display:flex;align-items:stretch;height:40px}
+.aa-prefix .pfx{background:#F5E6EA;color:#8B1538;font-weight:800;font-size:13px;padding:0 10px;display:flex;align-items:center;border:1px solid #D1D5DB;border-right:none;border-radius:6px 0 0 6px;flex-shrink:0}
+.aa-prefix input{border-radius:0 6px 6px 0!important;flex:1;min-width:0}
+.login-box h1{font-size:13.5px;line-height:1.25}
+.aa-acc-mini{padding:8px 0;border-bottom:1px solid #F0F0F0;font-size:12px}
+.aa-acc-mini .nm{font-weight:700}
+.aa-acc-mini .ac{font-size:11px;color:#6B7280}
+@media(max-width:380px){.aa-row3{grid-template-columns:1fr}}
 
 </style>
 </head>
-
 <body>
 
-<div class="loader-overlay" id="loader">
-  <div id="loaderContent">
-    <div class="loader" id="spinner"></div>
-    <div class="success-tick" id="successTick">✔</div>
-    <div class="loader-caption" id="loaderCaption">Posting to ledger…</div>
+<div id="loginScreen" class="login-wrap">
+  <div class="login-box">
+    <div class="logo">
+      <div class="li"><img src="data:image/png;base64,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" alt="SR"></div>
+      <h1>Shree Radha Credit Co-operative Society Ltd.</h1>
+      <div class="sub">Agent Collection App</div>
+    </div>
+    <div class="fg"><label>Agent Username / ID</label><input id="loginUser" placeholder="AGT10001 or username" autocomplete="username"></div>
+    <div class="fg"><label>Password</label><input type="password" id="loginPass" placeholder="Password" autocomplete="current-password"></div>
+    <button class="btn-login" id="loginBtn" onclick="doAgentLogin()">Login as Agent</button>
+    <p class="login-hint">Only AGENT role can login here</p>
   </div>
 </div>
 
-<div class="loader-overlay" id="confirmModal">
-  <div class="confirm-box">
-    <div class="confirm-title">Confirm Transaction</div>
-    <div class="confirm-sub">Please review the details before posting to the ledger.</div>
-
-    <div class="confirm-row"><span>Account</span><b id="cfAccount">—</b></div>
-    <div class="confirm-row"><span>Customer Name</span><b id="cfName">—</b></div>
-    <div class="confirm-row"><span>Type</span><b id="cfType">—</b></div>
-    <div class="confirm-row"><span>Mode</span><b id="cfMode">—</b></div>
-    <div class="confirm-row"><span>Agent ID</span><b id="cfAgent">—</b></div>
-    <div class="confirm-row" id="cfRemarksRow"><span>Remarks</span><b id="cfRemarks">—</b></div>
-    <div class="confirm-row total"><span>Amount</span><b id="cfAmount">₹0</b></div>
-
-    <div class="confirm-actions">
-      <button type="button" class="pill-btn" onclick="closeConfirm()">Edit</button>
-      <button type="button" class="banner save" onclick="confirmAndSave()">Confirm &amp; Save</button>
+<div id="agentApp" class="agent-app">
+  <div class="aa-top">
+    <div class="row">
+      <div class="brand-wrap">
+        <div class="brand-logo"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAL5ElEQVR42u2be5RVVR3HP3ufcx8zd2BmQBBNQEDQKUkRDDVEBhEDUsvs/bSVhvSyYLSWj17msuVitUpNy0qX2ouylWYZldBaBhSS0otS4qWpvGGYuTP3cc7+9cc+59xz7ozFNDMXzDmsy7r3zr737P3dv9/39/39fvsqY4zwCr40r/BrCIAhAIYAGALgiF/iG4zvg9Q+ILlHbtWCMQalNdp17FuA8Ty04/z/WoAYg/F8lNY4rovWmm1r/8hTK34GxuC4dk+M79dkPqpWQsj4PkqpaHeLHXn+9vCvWX/PCjavXkfJdHHi9Bm0fuoKpr39YpSjERGM7w+qRdQEAKVU9Hz301vYcP9PeOr7D7Fr6z9RaDLpBpRWFAp5DB4TZkyndemHOf1tb0Rpba3GmEEBYnABCEit2JHnrw+tZN23fsDmx9dQpkBONZOuz2J8H/ENgqC0RilFd6ETg8/Ema+jdemVnH7ZIlAKYwwywEAMPgBKkd+zn78/uooX/vwP9m7exot/+gd7n92OIGTTDShld1kCKlTaQSkoFDrx8Tnp7LNoXfZhXnvpAutOAwhEvwEQEZS188NyAYD8/oNs+e06/nDPCv7+yGMIhmy2ISK+cEJaa1AEFmGYPOssWpctZuolFw4YEP0GIFyc7/kgBpRCBY8QFBFBjAEBpVViwptXr+Vny25i25MbyGVHJNhfEBCi8YViJ4Jh8uzXM3fZYl5z0bx+A9FvADp376OuuRE3neqV+cUIKCL/jgOiUGjXodxd5MGPXMeae+6jPtsccQICBMajsECIQHexA4Apc2Yx75qrOGVBa+V+AtrRgw+AiKC15s5572Hv9i2Mm3Y6Y06dwvFTWxjdMonm8SeQrq9LfMb3PGsdWidA0o6DUooHP3IDq79+Fw3ZkRjfq6w+xicScAQIhWIHoGmZN5u5yxZz8oXnRXOrGQC3z3orm9asIkUGnzIal0w6R9MJxzFq8gSOO+0UJs6eycTXn0ld0/AIiLi5hu6hXYdvvuF9/GXlr8hlmxLuoCK3qCxQORoECqUOFJqW+XOY23YVk+eeY43nP/DSgAFwx3lvZ/Pv1lBfNxxjBBGDX/bw/TI+ZQweGpeRY8cx9U3zmbXkA4w+ZZKVwbEJim/Qjqb9hV3cetp8Cu0daJ2yvIKqACASkWT4ptYaAYrFPCW6+eC93+TM91+GX/YimT1oUlhZFsL3fIzn2YVoTSqdoT47nIa6kdRlhnHouV2suu0uls9YwGM3324nbSTSCsrR+J5H46vGcH7bEgpepx1jtzzYdancM+QGqZBgrqEJRzkc2PF8zF5qmQuIVB5GMJ6PKXuIMbjpNMPqjsEUDT++7npWXPkZdCB3IzAdBxFh5hXvYOTocZRLhUR4rXZtRSXSKFSQUdIrIQ8aAKFJql5NI+G41ve1orH+OFbdfSdr73oA7TiRrytlF1E/oomWhXMpmi4LUvgV8e+WMFBKJWSGxNoHrx4wC4gmWE08yj5CkESsv9frRlbdcielfJclxHB7A7AmtZ4V7WziK1VsqFTfnMM2/f4DID2fKqUqLyQ+RCXGiTGk3Az7djzL8xs32Z03JgaYYsSEsTikMcbvLb3oqTADYATpU13F7R/7xddrfb8idsLNVwl3sarIKkJPlTj4rxcTXxSOT+fqcXBDs0KRWHmMEBWocNHS0/0G2wXCCatol4PJqAowEgKkrDlHnxCNm0lXGZZdhNddQPCDwfazkcwO79fLVkvf1t9/F6gsqKf/C0nmSvCi75NN5Ti2ZbL9q1YJDjiw43k8SrYeEBM/EiPe6HmVZK5pSUwSVhD8ryqvlaNROiCyYBeddJp8+SCT5pzN6JMn2mpRTB6jFNvXPYlg8wUlsYgT+hbSc7VK9Xn+/eYAxBq5UmASktUuulTsAjSukwIUYgwdpX2MGD2WN331swkdICJoR1Pq6mbTI4+RUvWWBCPRY/29ArUgKhYF/gdN6/bXBaSKnSWGjxHD+DOnU2g/RMfOPYhvSDfmOHX2G1j0+TZGTZmA8U20+8bzcNNpnvjOj9i5/Rly2WZrHQnQVeIu4VsS/au1BfSIBIElaodyMc8ly69j3FnTOPTCLsQIdSMaqWscXimUBov3y2XcdJo9T2/lkRu/TMZtsCmzzWoSUSDygiqxZQlS9YkJBqgvUAlJYRSwzwxdB9pxUimax5/QIy1GKn0AN51m75Yd3H3x5XQfaCeTySG+XymqxElUxV9Lj7kIR0AJQiyxCQjPx9B98BCI4JXKGN+PqrthQ8RJpRBj2HD/T7j93EvZ/cwWMpmclcexAkqUY4QKS8KFqh7LVTURQr0kJXF6spAY9m191o4IqkJxO9706Gq2r9nApl+s5rmNG3FVhmwmhx/0EOLFjTD+Vxc7JCk5+xwL+02CCUqq8kmXFNsefyJQfk6iCuS4Ln/96a/55d3LGcHxZDPDK+2y2BeFC0/KX4mMIckDfQ8Dur8kKDHhLxL7gzFk3Qa2rl3P7qe3oLUNgXYR9rYLv9TGuGOnotIOIqaXUpYEpp4UQL0p0f9VBwyYFO4Ne51y6Sq0s+aO+62LhOasFX7Zo2HUCM656n10ldrRQZ2v96BeCXGR8vsvEammJKji+yCV/Nz3PLLOMJ6470e0P7/TVnVDKwhaXud+4nJGHz+JcrkQWYbEMVCxfPq/9BsSJFlrAIjNtaLTwE2nOdS+i7V33IdSypbBAiswvqGuaTjnf2YJRT8fkWQiyw0aLyqWSEUtB5He/b6W2aDj6gpRVVmuDoqdWWcY6+7+Pp179qFdpwKCozHGMPND72DsKadRLOUDslSx6p+KZL+qzsFVFQtXW2MtACi0d2LEQ7tuovkR0aMxuOkM+/c+x7q7vhtYgYlMWHxDKpth/uevxjOlZGKlonLAS1hdterruxLsXzosQstF55PNDaMjvwfjeTiuW4nhsZJ3xmlg3Z0P0H2g3VpBYLratTXB0y9bxJRzzqW7eMjW+5VKqJooE0RVgSyVoQm6HGQAlLasfuHnrqZt42+Y96mPkm1uoKN7L365bC0iJmZS6Sy7X9zG+m+viHY+ngUqrVh4c5slwkRRUyXdPCp9xcSn9NI9qYkLBFXcY04azyXLb2TpUytZcP015I4dQb57H16phE65EeGldT2P33YvxY68bViEVuA4GM9n0nkzOeMtl9BVOhh1jlSPmm+YGfReBVI1L4lpjfFtN6hp7HEs/GIbSzeu5OKbbqRx/Bjy3fspF4torclkc+x89hk23PdgUAI3VTsrLLh5GXX1Tfh+ufc+n0jMPcIudMwi+hgGBiYMatvlNcYCMezYY7jguo+x7KmVXPaVmxk1ZTz5wn5KXXmyqQZ+97V7KXd12y5uJI40xvcZNXkCs5dcTne5PbCCoBZYBYLEQ+CRjALVwiQORH1zI+dd/SGWPvlL3vWNrzBm6hS8comtz6xn4w8fiayn8nkrjlo/vZiRY0604shRxEWGijN9WHqLWcIRTIdfGoh0rp6zr3w3n3zi57z3gds5acY5PHrDctsAjUWEkCtyI5uZf/3HKfh5tNKxwBZwvHrJ/ksAhj6yAFQDIcbgex5OJs30d7+ZtvW/YtEt17Jny46gMFLZMe1YV5h5xTuZ8NoZFIqdUWU4ucu9FGcdB18Er1g6OgCIRwvtOEEX2UMQpr/nzYw949QgBCYrwiKCm06x6JZr8cVPkFpc6KgINAelFZ2d+3FVilEnTzzs7LC2J0VDIMSWxeQlmphhWGxZMIfT3riIfNGGxeocUTsOWmu6Cu2US0XOuPQi2n6/kjPeefFhnytUR+tPZsTYcwY7N23m1mkX4uiUrTkaE50MKRY70Di8etH5zL12CRPPfV1QijCHdTrkqAYgXjn6xQ3Lefimz9GgjkEpTcl02SMxF8yh9ZqrmDJvVjQ+DKmHbZRH9Y+mgnivtWblF77K77/1PUodnbxq2lRa2xbTsrByOgwJzgz11StfLr8aU0pR7MjT3d5O0wnHR6YuRvp0LO5lC0DoDiE/mKPlqGxtPUKi06YDdbm8jC6V6MUPzDX0o6khAIYAGAJgCIBX8vVvvVkVYnnnbD8AAAAASUVORK5CYII=" alt="SR"></div>
+        <div>
+          <div class="brand">SHREE RADHA CREDIT CO-OPERATIVE</div>
+          <div class="org">Society Limited</div>
+          <div class="sub" id="aa-agent-label">Agent Collection</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button type="button" class="icon-btn" onclick="aaOpenNotif()" title="Notifications">🔔<span class="bdg" id="aa-notif-bdg" style="display:none">0</span></button>
+        <div class="av" id="aa-avatar">A</div>
+        <button type="button" onclick="agentLogout()" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700">Logout</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="topbar">
-  <button class="back" title="Reset form" onclick="resetForm()">←</button>
-  <div class="brand">SRCCS <span>Agent Console</span></div>
-</div>
+  <div class="aa-stats">
+    <div class="aa-stat"><div class="v" id="aa-stat-total">₹0</div><div class="l">Today</div></div>
+    <div class="aa-stat"><div class="v" id="aa-stat-count">0</div><div class="l">Receipts</div></div>
+    <div class="aa-stat"><div class="v" id="aa-stat-active">0</div><div class="l">Active A/c</div></div>
+    <div class="aa-stat"><div class="v" id="aa-stat-closed">0</div><div class="l">Closed A/c</div></div>
+  </div>
 
-<div class="tabbar">
-  <button class="tab active" id="mtEntry" onclick="switchMainTab('entry')">Entry</button>
-  <button class="tab" id="mtReport" onclick="switchMainTab('report')">Report</button>
-  <button class="tab" id="mtHistory" onclick="switchMainTab('history')">History</button>
-  <div class="spacer"></div>
-  <button class="icon-btn" title="New entry" onclick="resetForm()">⟲</button>
-</div>
+  <div class="aa-body">
+    <div class="aa-tabs">
+      <button type="button" class="aa-tab on" data-tab="collect" onclick="aaTab('collect')">Collect</button>
+      <button type="button" class="aa-tab" data-tab="list" onclick="aaTab('list')">Today</button>
+      <button type="button" class="aa-tab" data-tab="alerts" onclick="aaTab('alerts')">Alerts</button>
+      <button type="button" class="aa-tab" data-tab="summary" onclick="aaTab('summary')">Summary</button>
+    </div>
 
-<div class="banner">Connected · Google Sheet Ledger</div>
+    <div id="aa-tab-collect">
+      <div class="aa-card">
+        <h3>Collection Type</h3>
+        <div class="aa-chips" id="aa-type-chips">
+          <button type="button" class="aa-chip on" data-type="DAILY" onclick="aaPickType(this)">Daily</button>
+          <button type="button" class="aa-chip" data-type="WEEKLY" onclick="aaPickType(this)">Weekly</button>
+          <button type="button" class="aa-chip" data-type="MONTHLY" onclick="aaPickType(this)">Monthly</button>
+          <button type="button" class="aa-chip" data-type="EMI" onclick="aaPickType(this)">Loan EMI</button>
+          <button type="button" class="aa-chip" data-type="SHARE" onclick="aaPickType(this)">Share</button>
+          <button type="button" class="aa-chip" data-type="MEMBER_FEE" onclick="aaPickType(this)">Member Fee</button>
+          <button type="button" class="aa-chip" data-type="OTHER" onclick="aaPickType(this)">Other</button>
+        </div>
+        <input type="hidden" id="aa_TYPE" value="DAILY">
+        <div class="aa-loan-box" id="aa-loan-box">
+          <div class="row"><span>Loan A/c</span><b id="aa-loan-no">—</b></div>
+          <div class="row"><span>EMI Amount</span><b id="aa-loan-emi">—</b></div>
+          <div class="row"><span>Due Date</span><b id="aa-loan-due">—</b></div>
+          <div class="row"><span>Outstanding</span><b id="aa-loan-out">—</b></div>
+          <div class="row"><span>EMI No.</span><b id="aa-loan-emi-no">—</b></div>
+        </div>
+      </div>
 
-<div class="app">
-
-  <!-- ================= ENTRY PANEL ================= -->
-  <div class="panel active" id="panel-entry">
-
-    <div class="card c1">
-      <div class="accent"></div>
-      <div class="card-body">
-        <div class="card-head">
-          <div class="card-num">1</div>
-          <div class="card-head-text">
-            <div class="breadcrumb">SRCCS &gt; Field Agent &gt; Member</div>
-            <div class="card-title">Member Verification</div>
+      <div class="aa-card">
+        <h3>Account / Amount / Mode</h3>
+        <div class="aa-row3">
+          <div class="aa-field">
+            <label>Account No. <span class="rq">*</span></label>
+            <div class="aa-prefix">
+              <span class="pfx">SRC</span>
+              <input type="text" id="aa_ACCOUNT_NO" placeholder="1253" inputmode="numeric" autocomplete="off" onblur="aaVerifyAccount()">
+            </div>
+          </div>
+          <div class="aa-field">
+            <label>Amount (₹) <span class="rq">*</span></label>
+            <input type="number" id="aa_AMOUNT" inputmode="decimal" min="1" step="0.01" placeholder="0.00">
+          </div>
+          <div class="aa-field">
+            <label>Payment Mode</label>
+            <select id="aa_MODE">
+              <option value="CASH">Cash</option>
+              <option value="UPI">UPI</option>
+              <option value="NEFT">NEFT</option>
+              <option value="IMPS">IMPS</option>
+              <option value="CHEQUE">Cheque</option>
+              <option value="BANK">Bank</option>
+            </select>
           </div>
         </div>
-
-        <div class="row">
-          <span class="k">Account Number</span>
-          <input id="account" value="SRC" inputmode="numeric" maxlength="7" oninput="formatAccount(this)">
-        </div>
-
-        <div class="row">
-          <span class="k">Customer Name</span>
-          <input id="name" readonly>
-        </div>
-
-        <div class="row">
-          <span class="k">Verification Status</span>
-          <span class="static-val grey" id="verifyStatus">Not verified</span>
-        </div>
+        <button type="button" class="aa-btn aa-btn-o" style="margin-top:8px" onclick="aaVerifyAccount()">Verify Account</button>
+        <div class="aa-verify" id="aa-acc-box"></div>
+        <div class="aa-field" id="aa-ref-wrap" style="display:none;margin-top:8px"><label>UPI / Cheque / Ref No.</label><input type="text" id="aa_REF" placeholder="Reference number"></div>
+        <div class="aa-field" style="margin-top:8px"><label>Particulars (auto)</label><textarea id="aa_REMARKS" readonly></textarea></div>
+        <div class="aa-field"><label>Agent ID (auto)</label><input type="text" id="aa_AGENT_ID" readonly></div>
+        <div class="aa-field"><label>Date</label><input type="date" id="aa_DATE" readonly></div>
       </div>
     </div>
 
-    <div class="card c2">
-      <div class="accent"></div>
-      <div class="card-body">
-        <div class="card-head">
-          <div class="card-num">2</div>
-          <div class="card-head-text">
-            <div class="breadcrumb">SRCCS &gt; Field Agent &gt; Ledger Entry</div>
-            <div class="card-title">Transaction Details</div>
-          </div>
-        </div>
-
-        <div class="row">
-          <span class="k">Transaction Type</span>
-          <select id="type">
-            <option value="credit">Credit</option>
-            <option value="debit">Debit</option>
-          </select>
-        </div>
-
-        <div class="row">
-          <span class="k">Amount (₹)</span>
-          <input id="amount" type="number">
-        </div>
-
-        <div class="row">
-          <span class="k">Agent ID</span>
-          <select id="agent">
-            <option value="">Select</option>
-            <option>AR4957</option>
-            <option>SH7333</option>
-            <option>KA4564</option>
-            <option>JE2659</option>
-            <option>SRCCS1432</option>
-          </select>
-        </div>
-
-        <div class="row">
-          <span class="k">Mode</span>
-          <select id="mode">
-            <option>Cash</option>
-            <option>UPI</option>
-            <option>Cheque</option>
-          </select>
-        </div>
-
-        <div class="row">
-          <span class="k">Remarks <span style="color:var(--text-faint);font-weight:400;">(optional)</span></span>
-          <input id="remarks" placeholder="e.g. part payment, weekly collection">
-        </div>
-
-        <button class="banner save" id="saveBtn" onclick="saveEntry()">Review &amp; Save</button>
-        <div id="msg" class="warn-box error" style="margin-top:10px;"></div>
+    <div id="aa-tab-list" style="display:none">
+      <div class="aa-card"><h3>Today's Collections</h3>
+        <div id="aa-list-body"><div class="aa-empty">No collections yet</div></div>
       </div>
     </div>
 
-  </div>
-
-  <!-- ================= REPORT PANEL ================= -->
-  <div class="panel" id="panel-report">
-
-    <div class="card c1">
-      <div class="accent"></div>
-      <div class="card-body">
-        <div class="card-head">
-          <div class="card-num">1</div>
-          <div class="card-head-text">
-            <div class="breadcrumb">SRCCS &gt; Field Agent &gt; Ledger Summary</div>
-            <div class="card-title">Collection Report</div>
-          </div>
-        </div>
-
-        <div class="subtabs">
-          <button class="subtab active" id="tabDaily" onclick="switchReportTab('daily')">Daily</button>
-          <button class="subtab" id="tabMonthly" onclick="switchReportTab('monthly')">Monthly</button>
-        </div>
-
-        <div class="date-controls" id="dailyControls">
-          <input type="date" id="reportDate">
-          <button class="pill-btn" onclick="runDailyReport()">Show</button>
-        </div>
-
-        <div class="date-controls" id="monthlyControls" style="display:none">
-          <input type="month" id="reportMonth">
-          <button class="pill-btn" onclick="runMonthlyReport()">Show</button>
-        </div>
-
-        <div class="row">
-          <span class="k">Credit Collection</span>
-          <span class="static-val green" id="repCredit">₹0</span>
-        </div>
-        <div class="row">
-          <span class="k">Debit</span>
-          <span class="static-val red" id="repDebit">₹0</span>
-        </div>
-        <div class="row">
-          <span class="k">Total Entries</span>
-          <span class="static-val" id="repCount">0</span>
-        </div>
-
-        <div class="report-net">
-          <span class="k">Net Collection</span>
-          <span class="v mono" id="repNet">₹0</span>
-        </div>
+    <div id="aa-tab-alerts" style="display:none">
+      <div class="aa-card">
+        <h3>Accounts Overview</h3>
+        <div class="aa-list-item"><span>Active Accounts</span><span class="amt" id="aa-alert-active">0</span></div>
+        <div class="aa-list-item"><span>Closed Accounts</span><span class="amt" id="aa-alert-closed" style="color:var(--er)">0</span></div>
+        <div class="aa-list-item" style="border-bottom:none"><span>Active Loans</span><span class="amt" id="aa-alert-loans">0</span></div>
+      </div>
+      <div class="aa-card">
+        <h3>All Accounts <span class="aa-badge info" id="aa-all-count">0</span></h3>
+        <div id="aa-all-list"><div class="aa-empty">Loading…</div></div>
+      </div>
+      <div class="aa-card">
+        <h3>Loan Accounts <span class="aa-badge info" id="aa-loan-count">0</span></h3>
+        <div id="aa-loan-list"><div class="aa-empty">Loading…</div></div>
+      </div>
+      <div class="aa-card">
+        <h3>Daily Collection Due <span class="aa-badge warn" id="aa-daily-count">0</span></h3>
+        <div id="aa-daily-list"><div class="aa-empty">Loading…</div></div>
+      </div>
+      <div class="aa-card">
+        <h3>Weekly Collection Due <span class="aa-badge warn" id="aa-weekly-count">0</span></h3>
+        <div id="aa-weekly-list"><div class="aa-empty">Loading…</div></div>
+      </div>
+      <div class="aa-card">
+        <h3>Monthly Collection Due <span class="aa-badge warn" id="aa-monthly-count">0</span></h3>
+        <div id="aa-monthly-list"><div class="aa-empty">Loading…</div></div>
       </div>
     </div>
 
+    <div id="aa-tab-summary" style="display:none">
+      <div class="aa-card">
+        <h3>Day Summary</h3>
+        <div class="aa-list-item"><span>Agent</span><span id="aa-sum-agent">—</span></div>
+        <div class="aa-list-item"><span>Date</span><span id="aa-sum-date">—</span></div>
+        <div class="aa-list-item"><span>Daily</span><span class="amt" id="aa-sum-daily">₹0</span></div>
+        <div class="aa-list-item"><span>Weekly</span><span class="amt" id="aa-sum-weekly">₹0</span></div>
+        <div class="aa-list-item"><span>Monthly</span><span class="amt" id="aa-sum-monthly">₹0</span></div>
+        <div class="aa-list-item"><span>Loan EMI</span><span class="amt" id="aa-sum-emi">₹0</span></div>
+        <div class="aa-list-item"><span>Other</span><span class="amt" id="aa-sum-other">₹0</span></div>
+        <div class="aa-list-item" style="border-bottom:none"><span style="font-weight:800">Total</span><span class="amt" id="aa-sum-total" style="font-size:15px">₹0</span></div>
+      </div>
+      <button type="button" class="aa-btn aa-btn-o" onclick="aaPrintDaySheet()" style="margin-bottom:10px">Print Day Sheet</button>
+    </div>
   </div>
 
-  <!-- ================= HISTORY PANEL ================= -->
-  <div class="panel" id="panel-history">
-    <div class="hist-total" id="totalBox">Total Collection: ₹0</div>
-    <div id="historyList"></div>
+  <div class="aa-bottom" id="aa-bottom-collect">
+    <button type="button" class="aa-btn aa-btn-o" onclick="aaReset()">Reset</button>
+    <button type="button" class="aa-btn aa-btn-p" id="aa-save-btn" onclick="aaSave()">Save Collection</button>
   </div>
-
 </div>
 
-<div class="bottombar" onclick="switchMainTab('history')">
-  <div class="grip"></div>
-  <div class="label">Total Collection: <b id="bottomTotal">₹0</b></div>
+<!-- Notification sheet -->
+<div class="aa-notif" id="aa-notif" onclick="if(event.target===this)aaCloseNotif()">
+  <div class="aa-notif-sheet">
+    <div class="aa-notif-head">
+      <h2>🔔 Notifications</h2>
+      <button type="button" onclick="aaCloseNotif()">✕</button>
+    </div>
+    <div class="aa-notif-body" id="aa-notif-body">
+      <div class="aa-empty">Loading…</div>
+    </div>
+  </div>
 </div>
+
+<div class="aa-toast" id="aa-toast"></div>
 
 <script>
-/* =======================================================
-   NOTE: Google Sheet / Apps Script integration section
-   (API, fetchName, saveEntry request) is UNCHANGED.
-   Only presentation/markup/tabs around it were added.
-   ======================================================= */
-
-const API="https://script.google.com/macros/s/AKfycbxuWtWOZ02G8qgn3ghIrqxbpvRlt6uMTEiO0IlDA5_KePadcfXHiBxqIWGYCExKTZZMVg/exec";
-
-const account=document.getElementById("account");
-const name=document.getElementById("name");
-const verifyStatus=document.getElementById("verifyStatus");
-const msg=document.getElementById("msg");
-const amount=document.getElementById("amount");
-const type=document.getElementById("type");
-const agent=document.getElementById("agent");
-const mode=document.getElementById("mode");
-const remarks=document.getElementById("remarks");
-const historyList=document.getElementById("historyList");
-const totalBox=document.getElementById("totalBox");
-const bottomTotal=document.getElementById("bottomTotal");
-const saveBtn=document.getElementById("saveBtn");
-const loader=document.getElementById("loader");
-
-let t=null;
-
-function formatAccount(el){
-  let v = el.value.replace(/[^0-9]/g,'');
-  if(v.length>4) v=v.slice(0,4);
-  el.value = "SRC" + v;
+const GS_URL="https://script.google.com/macros/s/AKfycbyZwWaZTfSMegft0jdmLwicxdPec2b37EhxKtgl7TYqqXxD0fAFhGZlJejwjhrzi138Ag/exec";
+let session={employeeCode:"",role:"",name:"",agentId:"",mobile:"",branchId:""};
+window._aaAccount=null; window._aaLoan=null; window._aaList=[]; window._aaType="DAILY";
+window._aaNotif={loans:[], daily:[], weekly:[], monthly:[], active:0, closed:0};
+window._aaNotifLoaded=false; window._aaListCache={}; window._aaListTs=0;
+var AGENT_SESSION_KEY="srccs_agent_session_v1";
+function saveAgentSession(){
+  try{ localStorage.setItem(AGENT_SESSION_KEY, JSON.stringify({
+    employeeCode:session.employeeCode||"", role:session.role||"AGENT", name:session.name||"",
+    agentId:session.agentId||"", mobile:session.mobile||"", branchId:session.branchId||"", savedAt:Date.now()
+  })); }catch(e){}
+}
+function clearAgentSession(){ try{ localStorage.removeItem(AGENT_SESSION_KEY); }catch(e){} }
+function loadAgentSession(){
+  try{
+    var raw=localStorage.getItem(AGENT_SESSION_KEY); if(!raw) return null;
+    var s=JSON.parse(raw); if(!s||!(s.agentId||s.employeeCode)) return null;
+    if(s.savedAt && (Date.now()-s.savedAt)>90*24*60*60*1000){ clearAgentSession(); return null; }
+    return s;
+  }catch(e){ return null; }
 }
 
-/* ================= MAIN TABS (new) ================= */
-function switchMainTab(tab){
-  document.getElementById("panel-entry").classList.toggle("active", tab==="entry");
-  document.getElementById("panel-report").classList.toggle("active", tab==="report");
-  document.getElementById("panel-history").classList.toggle("active", tab==="history");
-
-  document.getElementById("mtEntry").classList.toggle("active", tab==="entry");
-  document.getElementById("mtReport").classList.toggle("active", tab==="report");
-  document.getElementById("mtHistory").classList.toggle("active", tab==="history");
-
-  if(tab==="report"){
-    if(document.getElementById("tabDaily").classList.contains("active")) runDailyReport();
-    else runMonthlyReport();
-  }
-  if(tab==="history") showHistory();
-  window.scrollTo(0,0);
+function today(){
+  var d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
+function todayISO(){ return today(); }
+function fmt(n){ return "₹"+Number(n||0).toLocaleString("en-IN"); }
 
-function resetForm(){
-  account.value="SRC";
-  name.value="";
-  amount.value="";
-  remarks.value="";
-  verifyStatus.innerText="Not verified";
-  verifyStatus.className="static-val grey";
-  msg.classList.remove("show");
-  msg.innerText="";
-  switchMainTab("entry");
-}
-
-window.onload=()=>{
-  showHistory();
-
-  const today=new Date();
-  document.getElementById("reportDate").value=today.toISOString().slice(0,10);
-  document.getElementById("reportMonth").value=today.toISOString().slice(0,7);
-  runDailyReport();
-};
-
-/* ================= FETCH NAME (Google Sheet - unchanged) ================= */
-account.addEventListener("input",()=>{
-  clearTimeout(t);
-  t=setTimeout(fetchName,400);
-});
-
-function fetchName(){
- let acc=account.value.trim();
-
-if(acc.length!==7) return;
-
-  fetch(`${API}?fn=getName&account=${acc}`)
-    .then(r=>r.json())
-    .then(d=>{
-      if(d.success){
-        name.value=d.name;
-        verifyStatus.innerText="Verified";
-        verifyStatus.className="static-val green";
-      }else{
-        name.value="";
-        verifyStatus.innerText="Not found";
-        verifyStatus.className="static-val red";
-      }
-    });
-}
-
-/* ================= HISTORY (local, persists across days) ================= */
-function getAllEntries(){
-  let h=JSON.parse(localStorage.getItem("SRCCS_HISTORY")||"{}");
-  let all=[];
-  Object.values(h).forEach(arr=>arr.forEach(x=>all.push(x)));
-  return all;
-}
-
-function showHistory(){
-  let all=getAllEntries();
-  let total=0;
-
-  all.forEach(x=>{
-    if(x.type==="credit") total+=Number(x.amount);
-  });
-
-  all.sort((a,b)=>b.time-a.time);
-  historyList.innerHTML="";
-
-  if(all.length===0){
-    historyList.innerHTML=`<div class="empty-note">No entries yet — first transaction will appear here.</div>`;
-  }
-
-  all.forEach(x=>{
-    historyList.innerHTML+=`
-      <div class="hist-item ${x.type}">
-        <div class="name-line">${x.name} <span style="color:var(--text-faint);font-weight:400;">(${x.account})</span></div>
-        <div class="amt-line ${x.type}">${x.type.toUpperCase()} ₹${x.amount}</div>
-        <div class="meta">${new Date(x.time).toLocaleString()} · Agent ${x.agent}</div>
-      </div>`;
-  });
-
-  totalBox.innerText="Total Collection: ₹"+total;
-  bottomTotal.innerText="₹"+total;
-}
-
-/* ================= COLLECTION REPORT (local calculation) ================= */
-function switchReportTab(tabName){
-  const dailyBtn=document.getElementById("tabDaily");
-  const monthlyBtn=document.getElementById("tabMonthly");
-  const dailyC=document.getElementById("dailyControls");
-  const monthlyC=document.getElementById("monthlyControls");
-
-  if(tabName==="daily"){
-    dailyBtn.classList.add("active");
-    monthlyBtn.classList.remove("active");
-    dailyC.style.display="flex";
-    monthlyC.style.display="none";
-    runDailyReport();
-  }else{
-    monthlyBtn.classList.add("active");
-    dailyBtn.classList.remove("active");
-    monthlyC.style.display="flex";
-    dailyC.style.display="none";
-    runMonthlyReport();
-  }
-}
-
-function renderReport(entries){
-  let credit=0, debit=0;
-  entries.forEach(x=>{
-    if(x.type==="credit") credit+=Number(x.amount);
-    else debit+=Number(x.amount);
-  });
-
-  document.getElementById("repCredit").innerText="₹"+credit;
-  document.getElementById("repDebit").innerText="₹"+debit;
-  document.getElementById("repNet").innerText="₹"+(credit-debit);
-  document.getElementById("repCount").innerText=entries.length;
-}
-
-function runDailyReport(){
-  const dateVal=document.getElementById("reportDate").value;
-  if(!dateVal) return;
-
-  const target=new Date(dateVal).toDateString();
-  const entries=getAllEntries().filter(x=>new Date(x.time).toDateString()===target);
-  renderReport(entries);
-}
-
-function runMonthlyReport(){
-  const monthVal=document.getElementById("reportMonth").value; // "YYYY-MM"
-  if(!monthVal) return;
-
-  const entries=getAllEntries().filter(x=>{
-    const d=new Date(x.time);
-    const key=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
-    return key===monthVal;
-  });
-  renderReport(entries);
-}
-
-/* ================= REVIEW ENTRY (opens confirm dialog) ================= */
-function saveEntry(){
-
-  if(!name.value){
-    msg.innerText="Account not verified";
-    msg.classList.add("show");
-    return;
-  }
-
-  if(!account.value||!amount.value||!agent.value){
-    msg.innerText="Required fields missing";
-    msg.classList.add("show");
-    return;
-  }
-
-  if(Number(amount.value)<=0){
-    msg.innerText="Please enter a valid amount";
-    msg.classList.add("show");
-    return;
-  }
-
-  msg.classList.remove("show");
-  openConfirm();
-}
-
-/* ================= CONFIRM DIALOG ================= */
-function openConfirm(){
-  document.getElementById("cfAccount").innerText=account.value;
-  document.getElementById("cfName").innerText=name.value;
-  document.getElementById("cfType").innerText=type.value.charAt(0).toUpperCase()+type.value.slice(1);
-  document.getElementById("cfMode").innerText=mode.value;
-  document.getElementById("cfAgent").innerText=agent.value;
-  document.getElementById("cfAmount").innerText="₹"+Number(amount.value).toLocaleString("en-IN");
-
-  const remarksRow=document.getElementById("cfRemarksRow");
-  if(remarks.value.trim()){
-    document.getElementById("cfRemarks").innerText=remarks.value.trim();
-    remarksRow.style.display="flex";
-  }else{
-    remarksRow.style.display="none";
-  }
-
-  document.getElementById("confirmModal").style.display="flex";
-}
-
-function closeConfirm(){
-  document.getElementById("confirmModal").style.display="none";
-}
-
-/* ================= SAVE ENTRY (Google Sheet - unchanged) ================= */
-function confirmAndSave(){
-  closeConfirm();
-
-  const spinner=document.getElementById("spinner");
-  const successTick=document.getElementById("successTick");
-  const loaderCaption=document.getElementById("loaderCaption");
-
-  loader.style.display="flex";
-  spinner.style.display="block";
-  successTick.style.display="none";
-  loaderCaption.innerText="Posting to ledger…";
-  saveBtn.disabled=true;
-
-  fetch(API,{
+function postGAS(payload){
+  return fetch(GS_URL,{
     method:"POST",
-    mode:"no-cors",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      action:"addLedger",
-      account:account.value,
-      amount:amount.value,
-      type:type.value,
-      agent:agent.value,
-      mode:mode.value,
-      remarks:remarks.value
-    })
-  })
-  .then(()=>{
-
-    /* SPINNER HIDE */
-    spinner.style.display="none";
-
-    /* SHOW SUCCESS */
-    successTick.style.display="flex";
-    loaderCaption.innerText="Entry recorded";
-
-    /* LOCAL HISTORY UPDATE */
-    let h=JSON.parse(localStorage.getItem("SRCCS_HISTORY")||"{}");
-    if(!h[account.value]) h[account.value]=[];
-    h[account.value].push({
-      account:account.value,
-      name:name.value,
-      amount:amount.value,
-      type:type.value,
-      agent:agent.value,
-      mode:mode.value,
-      remarks:remarks.value,
-      time:Date.now()
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload),
+    redirect:"follow"
+  }).then(function(res){
+    return res.text().then(function(t){
+      try{ return JSON.parse(t); }
+      catch(e){ return {status:"error",message:"Invalid server response"}; }
     });
-    localStorage.setItem("SRCCS_HISTORY",JSON.stringify(h));
-
-    setTimeout(()=>{
-      loader.style.display="none";
-      saveBtn.disabled=false;
-
-      account.value="";
-      name.value="";
-      amount.value="";
-      remarks.value="";
-      verifyStatus.innerText="Not verified";
-      verifyStatus.className="static-val grey";
-
-      showHistory();
-
-      if(document.getElementById("tabDaily").classList.contains("active")){
-        runDailyReport();
-      }else{
-        runMonthlyReport();
-      }
-    },1200);
-
-  })
-  .catch(()=>{
-    loader.style.display="none";
-    saveBtn.disabled=false;
-    msg.innerText="Network error";
-    msg.classList.add("show");
+  }).catch(function(err){
+    return {status:"error",message:"Network error: "+String(err)};
   });
 }
+
+function aaToast(msg){
+  var t=document.getElementById("aa-toast");
+  t.textContent=msg; t.classList.add("show");
+  setTimeout(function(){ t.classList.remove("show"); }, 2200);
+}
+
+function doAgentLogin(){
+  var u=(document.getElementById("loginUser").value||"").trim();
+  var p=document.getElementById("loginPass").value||"";
+  if(!u||!p){ alert("Enter username and password"); return; }
+  var btn=document.getElementById("loginBtn");
+  btn.disabled=true; btn.textContent="Checking…";
+  postGAS({action:"login", username:u, password:p, role:"AGENT"}).then(function(res){
+    btn.disabled=false; btn.textContent="Login as Agent";
+    if(!res||res.status!=="success"||!res.user){ alert((res&&res.message)||"Invalid login"); return; }
+    var us=res.user;
+    var role=String(us.ROLE||"").toUpperCase();
+    if(role && role!=="AGENT"){ alert("Only AGENT role can use this app. Role: "+role); return; }
+    var code=us.EMPLOYEE_CODE||us.EMPLOYEE_ID||us.AGENT_ID||u;
+    session.employeeCode=code; session.role="AGENT";
+    session.name=(us.USERNAME||u).toUpperCase();
+    session.agentId=us.AGENT_ID||code; session.mobile=us.MOBILE||""; session.branchId=us.BRANCH_ID||"";
+    saveAgentSession();
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("agentApp").classList.add("show");
+    initMobileAgentApp(true);
+    aaToast("Welcome "+session.name);
+  }).catch(function(){ btn.disabled=false; btn.textContent="Login as Agent"; alert("Could not reach server"); });
+}
+
+function agentLogout(){
+  if(!confirm("Logout?")) return;
+  session={employeeCode:"",role:"",name:"",agentId:"",mobile:"",branchId:""};
+  window._aaAccount=null; window._aaLoan=null; window._aaList=[];
+  window._aaNotifLoaded=false; window._aaListCache={}; window._aaListTs=0;
+  clearAgentSession();
+  document.getElementById("agentApp").classList.remove("show");
+  document.getElementById("loginScreen").classList.remove("hidden");
+  document.getElementById("loginPass").value="";
+}
+
+function initMobileAgentApp(isFreshLogin){
+  var agentId=session.agentId||session.employeeCode||"";
+  document.getElementById("aa_AGENT_ID").value=agentId;
+  document.getElementById("aa_DATE").value=today();
+  document.getElementById("aa-agent-label").textContent=(session.name||"Agent")+" • "+agentId;
+  document.getElementById("aa-avatar").textContent=(session.name||"A")[0].toUpperCase();
+  document.getElementById("aa-sum-agent").textContent=(session.name||"")+" ("+agentId+")";
+  document.getElementById("aa-sum-date").textContent=today();
+  var chip=document.querySelector("#aa-type-chips .aa-chip.on");
+  if(chip) aaPickType(chip);
+  document.getElementById("aa_MODE").onchange=function(){
+    document.getElementById("aa-ref-wrap").style.display=(this.value==="CASH")?"none":"block";
+    aaAutoParticulars();
+  };
+  document.getElementById("aa_AMOUNT").oninput=function(){ aaAutoParticulars(); };
+  aaAutoParticulars();
+  // Fast: only today's collections. Heavy notif sheets load in background.
+  aaLoadList(true);
+  setTimeout(function(){ aaLoadNotifications(false); }, isFreshLogin ? 900 : 400);
+  if(agentId && (!session.name || session.name===agentId || session.name===session.employeeCode)){
+    postGAS({action:"get_list", sheet:"AGENT_MASTER", limit:200}).then(function(r){
+      var rows=(r&&r.rows)||[], q=agentId.toUpperCase();
+      for(var i=0;i<rows.length;i++){
+        var a=rows[i];
+        if(String(a.AGENT_ID||"").toUpperCase()===q||String(a.AGENT_CODE||"").toUpperCase()===q||String(a.MOBILE||"")===agentId){
+          session.agentId=a.AGENT_ID||agentId;
+          document.getElementById("aa_AGENT_ID").value=session.agentId;
+          if(a.AGENT_NAME){
+            session.name=a.AGENT_NAME;
+            saveAgentSession();
+            document.getElementById("aa-agent-label").textContent=a.AGENT_NAME+" • "+session.agentId;
+            document.getElementById("aa-sum-agent").textContent=a.AGENT_NAME+" ("+session.agentId+")";
+            document.getElementById("aa-avatar").textContent=a.AGENT_NAME[0].toUpperCase();
+          }
+          break;
+        }
+      }
+    });
+  }
+}
+
+// Auto-login — same device, password not asked again until Logout
+(function tryAgentAutoLogin(){
+  var s=loadAgentSession();
+  if(!s) return;
+  session.employeeCode=s.employeeCode||"";
+  session.role=s.role||"AGENT";
+  session.name=s.name||"";
+  session.agentId=s.agentId||s.employeeCode||"";
+  session.mobile=s.mobile||"";
+  session.branchId=s.branchId||"";
+  function go(){
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("agentApp").classList.add("show");
+    initMobileAgentApp(false);
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", go);
+  else go();
+})();
+
+function aaTab(name){
+  document.querySelectorAll(".aa-tab").forEach(function(t){ t.classList.toggle("on", t.getAttribute("data-tab")===name); });
+  ["collect","list","alerts","summary"].forEach(function(t){
+    var el=document.getElementById("aa-tab-"+t);
+    if(el) el.style.display = (t===name)?"block":"none";
+  });
+  document.getElementById("aa-bottom-collect").style.display = name==="collect"?"grid":"none";
+  if(name==="list"||name==="summary") aaLoadList(false);
+  if(name==="alerts") aaLoadNotifications(true);
+}
+
+function aaPickType(el){
+  if(!el) return;
+  document.querySelectorAll("#aa-type-chips .aa-chip").forEach(function(c){ c.classList.remove("on"); });
+  el.classList.add("on");
+  window._aaType=el.getAttribute("data-type")||"DAILY";
+  document.getElementById("aa_TYPE").value=window._aaType;
+  var loanBox=document.getElementById("aa-loan-box");
+  if(window._aaType==="EMI"){ loanBox.classList.add("show"); if(window._aaAccount) aaLoadLoanEMI(); }
+  else { loanBox.classList.remove("show"); window._aaLoan=null; }
+  aaAutoParticulars();
+}
+
+function aaAutoParticulars(){
+  var type=window._aaType||"DAILY";
+  var acc=aaFullAccountNo();
+  var name=(window._aaAccount&&window._aaAccount.ACCOUNT_NAME)||"";
+  var mode=document.getElementById("aa_MODE").value||"CASH";
+  var agent=document.getElementById("aa_AGENT_ID").value||session.agentId||"";
+  var date=document.getElementById("aa_DATE").value||"";
+  var amt=document.getElementById("aa_AMOUNT").value||"";
+  var parts=[];
+  if(type==="DAILY") parts.push("Daily Deposit Collection");
+  else if(type==="WEEKLY") parts.push("Weekly Deposit Collection");
+  else if(type==="MONTHLY") parts.push("Monthly Deposit Collection");
+  else if(type==="EMI"){
+    parts.push("Loan EMI Collection");
+    if(window._aaLoan){
+      if(window._aaLoan.LOAN_ACCOUNT_NO) parts.push("Loan A/c "+window._aaLoan.LOAN_ACCOUNT_NO);
+      if(window._aaLoan.EMI_NO) parts.push("EMI #"+window._aaLoan.EMI_NO);
+      if(window._aaLoan.DUE_DATE) parts.push("Due "+window._aaLoan.DUE_DATE);
+    }
+  }
+  else if(type==="SHARE") parts.push("Share Capital Collection");
+  else if(type==="MEMBER_FEE") parts.push("Member Fee Collection");
+  else parts.push("Other Collection");
+  if(acc) parts.push("A/c "+acc);
+  if(name) parts.push(name);
+  if(amt) parts.push("Rs "+amt);
+  parts.push("Mode: "+mode); parts.push("Agent: "+agent);
+  if(date) parts.push("Date: "+date);
+  document.getElementById("aa_REMARKS").value=parts.join(" | ");
+}
+
+
+function aaFullAccountNo(){
+  var n = (document.getElementById("aa_ACCOUNT_NO").value||"").trim().toUpperCase();
+  if(!n) return "";
+  if(n.indexOf("SRC")===0) return n;
+  // digits only preferred
+  n = n.replace(/^SRC/i,"");
+  return "SRC"+n;
+}
+
+function aaVerifyAccount(){
+  var acc=aaFullAccountNo();
+  var box=document.getElementById("aa-acc-box");
+  if(!acc||acc==="SRC"){ box.className="aa-verify err show"; box.innerHTML="Enter account number"; return; }
+  box.className="aa-verify show"; box.innerHTML="Verifying…";
+  postGAS({action:"lookup_account", account_no:acc}).then(function(r){
+    if(!r||r.status!=="success"){
+      box.className="aa-verify err show";
+      box.innerHTML="⚠️ "+((r&&r.message)||"Account not found");
+      window._aaAccount=null; aaAutoParticulars(); return;
+    }
+    var st=String(r.ACCOUNT_STATUS||"ACTIVE").toUpperCase();
+    if(st==="CLOSED"||st==="BLOCKED"){
+      box.className="aa-verify err show";
+      box.innerHTML="⚠️ Account is <b>"+st+"</b>";
+      window._aaAccount=null; return;
+    }
+    window._aaAccount=r;
+    box.className="aa-verify ok show";
+    box.innerHTML='<b>✓ Verified</b><div class="grid">'
+      +'<div><b>Name</b>'+(r.ACCOUNT_NAME||"—")+'</div>'
+      +'<div><b>Type</b>'+(r.ACCOUNT_TYPE||"—")+'</div>'
+      +'<div><b>Balance</b>'+fmt(r.CURRENT_BALANCE)+'</div>'
+      +'<div><b>Mobile</b>'+(r.MOBILE||"—")+'</div>'
+      +'<div><b>KYC</b>'+(r.KYC_STATUS||"—")+'</div>'
+      +'<div><b>Status</b>'+(r.ACCOUNT_STATUS||"—")+'</div></div>';
+    aaToast("Account OK: "+(r.ACCOUNT_NAME||r.ACCOUNT_NO));
+    if(window._aaType==="EMI") aaLoadLoanEMI(); else aaAutoParticulars();
+  }).catch(function(){ box.className="aa-verify err show"; box.innerHTML="Network error"; });
+}
+
+function aaLoadLoanEMI(){
+  var acc=aaFullAccountNo();
+  var cid=window._aaAccount&&window._aaAccount.CUSTOMER_ID;
+  if(!acc&&!cid) return;
+  postGAS({action:"get_list", sheet:"LOAN_REGISTRATION_MASTER", limit:500}).then(function(r){
+    var loans=(r&&r.rows)||[], loan=null;
+    for(var i=0;i<loans.length;i++){
+      var L=loans[i], st=String(L.LOAN_STATUS||"").toUpperCase();
+      if(st==="REJECTED"||st==="CLOSED") continue;
+      if(String(L.ACCOUNT_NO)===acc||String(L.CUSTOMER_ID)===String(cid)||String(L.LOAN_ACCOUNT_NO)===acc){ loan=L; break; }
+    }
+    if(!loan){
+      ["aa-loan-no","aa-loan-emi","aa-loan-due","aa-loan-out","aa-loan-emi-no"].forEach(function(id,i){
+        document.getElementById(id).textContent = i===0 ? "No active loan" : "—";
+      });
+      window._aaLoan=null; aaAutoParticulars(); return;
+    }
+    var loanNo=loan.LOAN_ACCOUNT_NO||loan.APPLICATION_ID;
+    document.getElementById("aa-loan-no").textContent=loanNo||"—";
+    document.getElementById("aa-loan-out").textContent=fmt(loan.OUTSTANDING_PRINCIPAL||loan.LOAN_AMOUNT);
+    postGAS({action:"get_next_emi", loan_account_no:loanNo}).then(function(nr){
+      var emi=(nr&&(nr.emi||nr.row||nr))||{};
+      window._aaLoan={
+        LOAN_ACCOUNT_NO:loanNo,
+        EMI_AMOUNT:emi.EMI_AMOUNT||loan.EMI_AMOUNT,
+        DUE_DATE:emi.DUE_DATE||"",
+        EMI_NO:emi.EMI_NO||"",
+        OUTSTANDING:loan.OUTSTANDING_PRINCIPAL||loan.LOAN_AMOUNT
+      };
+      document.getElementById("aa-loan-emi").textContent=fmt(window._aaLoan.EMI_AMOUNT);
+      document.getElementById("aa-loan-due").textContent=window._aaLoan.DUE_DATE||"—";
+      document.getElementById("aa-loan-emi-no").textContent=window._aaLoan.EMI_NO||"—";
+      if(window._aaLoan.EMI_AMOUNT) document.getElementById("aa_AMOUNT").value=window._aaLoan.EMI_AMOUNT;
+      aaAutoParticulars();
+    }).catch(function(){
+      window._aaLoan={LOAN_ACCOUNT_NO:loanNo, EMI_AMOUNT:loan.EMI_AMOUNT, OUTSTANDING:loan.OUTSTANDING_PRINCIPAL};
+      if(loan.EMI_AMOUNT) document.getElementById("aa_AMOUNT").value=loan.EMI_AMOUNT;
+      aaAutoParticulars();
+    });
+  });
+}
+
+function aaSave(){
+  if(!window._aaAccount){ aaToast("Pehle Account Verify karein"); aaVerifyAccount(); return; }
+  var amt=parseFloat(document.getElementById("aa_AMOUNT").value)||0;
+  if(amt<=0){ aaToast("Amount enter karein"); return; }
+  var agentId=document.getElementById("aa_AGENT_ID").value||session.agentId||session.employeeCode;
+  if(!agentId){ aaToast("Agent ID missing"); return; }
+  aaAutoParticulars();
+  var row={
+    COLLECTION_ID:"", DATE:document.getElementById("aa_DATE").value||today(),
+    AGENT_ID:agentId, EMPLOYEE_ID:session.employeeCode||agentId,
+    ACCOUNT_NO:aaFullAccountNo(),
+    CUSTOMER_ID:(window._aaAccount&&window._aaAccount.CUSTOMER_ID)||"",
+    COLLECTION_TYPE:window._aaType||"DAILY", AMOUNT:amt, RECEIPT_NO:"", STATUS:"COLLECTED",
+    PAYMENT_MODE:document.getElementById("aa_MODE").value||"CASH",
+    REFERENCE_NO:document.getElementById("aa_REF").value||"",
+    REMARKS:document.getElementById("aa_REMARKS").value||"",
+    ACCOUNT_NAME:(window._aaAccount&&window._aaAccount.ACCOUNT_NAME)||"",
+    AGENT_NAME:session.name||""
+  };
+  if(window._aaType==="EMI"&&window._aaLoan){
+    row.LOAN_ACCOUNT_NO=window._aaLoan.LOAN_ACCOUNT_NO||"";
+    row.EMI_NO=window._aaLoan.EMI_NO||"";
+  }
+  var btn=document.getElementById("aa-save-btn");
+  btn.disabled=true; btn.textContent="Saving…";
+  function doneOk(){
+    btn.disabled=false; btn.textContent="Save Collection";
+    aaToast("✓ Saved "+fmt(amt));
+    document.getElementById("aa_ACCOUNT_NO").value="";
+    document.getElementById("aa_AMOUNT").value="";
+    document.getElementById("aa_REF").value="";
+    document.getElementById("aa-acc-box").className="aa-verify";
+    document.getElementById("aa-acc-box").innerHTML="";
+    window._aaAccount=null; window._aaLoan=null;
+    document.getElementById("aa-loan-box").classList.remove("show");
+    aaAutoParticulars(); window._aaListCache={}; window._aaListTs=0; aaLoadList(true);
+  }
+  var payload={action:"append", sheet:"DAILY_COLLECTION_MASTER", row:row};
+  if(window._aaType==="EMI"&&window._aaLoan&&window._aaLoan.LOAN_ACCOUNT_NO){
+    payload={
+      action:"emi_collection", LOAN_ACCOUNT_NO:window._aaLoan.LOAN_ACCOUNT_NO,
+      ACCOUNT_NO:row.ACCOUNT_NO, CUSTOMER_ID:row.CUSTOMER_ID,
+      EMI_AMOUNT:amt, TOTAL_RECEIVED:amt, PAYMENT_MODE:row.PAYMENT_MODE,
+      COLLECTED_BY:agentId, AGENT_ID:agentId, STATUS:"PAID", REMARKS:row.REMARKS
+    };
+  }
+  postGAS(payload).then(function(r){
+    if(!r||r.status!=="success"){
+      if(payload.action==="emi_collection"){
+        return postGAS({action:"append", sheet:"DAILY_COLLECTION_MASTER", row:row}).then(function(r2){
+          if(!r2||r2.status!=="success"){ btn.disabled=false; btn.textContent="Save Collection"; aaToast((r2&&r2.message)||"Save failed"); return; }
+          doneOk();
+        });
+      }
+      btn.disabled=false; btn.textContent="Save Collection";
+      aaToast((r&&r.message)||"Save failed"); return;
+    }
+    doneOk();
+  }).catch(function(){ btn.disabled=false; btn.textContent="Save Collection"; aaToast("Network error"); });
+}
+
+function aaReset(){
+  document.getElementById("aa_ACCOUNT_NO").value="";
+  document.getElementById("aa_AMOUNT").value="";
+  document.getElementById("aa_REF").value="";
+  document.getElementById("aa-acc-box").className="aa-verify";
+  document.getElementById("aa-acc-box").innerHTML="";
+  window._aaAccount=null; window._aaLoan=null;
+  document.getElementById("aa-loan-box").classList.remove("show");
+  aaAutoParticulars();
+}
+
+function aaLoadList(force){
+  var agentId=(session.agentId||session.employeeCode||"").toUpperCase();
+  var date=document.getElementById("aa_DATE").value||today();
+  var cacheKey=agentId+"|"+date;
+  if(!force && window._aaListCache[cacheKey] && (Date.now()-(window._aaListTs||0))<45000){
+    var cached=window._aaListCache[cacheKey];
+    window._aaList=cached;
+    return paintAaListUI(cached);
+  }
+  postGAS({action:"get_list", sheet:"DAILY_COLLECTION_MASTER", limit:800}).then(function(r){
+    var rows=((r&&r.rows)||[]).filter(function(x){
+      if(String(x.AGENT_ID||"").toUpperCase()!==agentId) return false;
+      var d=String(x.DATE||"").substring(0,10);
+      if(date&&d&&d!==date) return false;
+      return true;
+    });
+    window._aaListCache[cacheKey]=rows;
+    window._aaListTs=Date.now();
+    window._aaList=rows;
+    paintAaListUI(rows);
+  });
+}
+function paintAaListUI(rows){
+    rows=rows||[];
+    var total=0,cash=0,daily=0,weekly=0,monthly=0,emi=0,other=0;
+    rows.forEach(function(x){
+      var a=parseFloat(x.AMOUNT)||0; total+=a;
+      var m=String(x.PAYMENT_MODE||"").toUpperCase();
+      if(m.indexOf("CASH")>=0||!m) cash+=a;
+      var t=String(x.COLLECTION_TYPE||"").toUpperCase();
+      if(t.indexOf("DAILY")>=0) daily+=a;
+      else if(t.indexOf("WEEKLY")>=0) weekly+=a;
+      else if(t.indexOf("MONTHLY")>=0) monthly+=a;
+      else if(t.indexOf("EMI")>=0||t.indexOf("LOAN")>=0) emi+=a;
+      else other+=a;
+    });
+    document.getElementById("aa-stat-total").textContent=fmt(total);
+    document.getElementById("aa-stat-count").textContent=String(rows.length);
+    document.getElementById("aa-sum-daily").textContent=fmt(daily);
+    document.getElementById("aa-sum-weekly").textContent=fmt(weekly);
+    document.getElementById("aa-sum-monthly").textContent=fmt(monthly);
+    document.getElementById("aa-sum-emi").textContent=fmt(emi);
+    document.getElementById("aa-sum-other").textContent=fmt(other);
+    document.getElementById("aa-sum-total").textContent=fmt(total);
+    var body=document.getElementById("aa-list-body");
+    if(!rows.length){ body.innerHTML='<div class="aa-empty">No collections yet today</div>'; return; }
+    body.innerHTML=rows.map(function(x){
+      return '<div class="aa-list-item"><div><div class="nm">'+(x.ACCOUNT_NAME||"—")+'</div>'
+        +'<div class="meta">'+(x.ACCOUNT_NO||"—")+'</div></div>'
+        +'<div class="amt">'+fmt(x.AMOUNT)+'</div></div>';
+    }).join("");
+}
+
+/* ===== Notifications: loans, daily/weekly/monthly lists, active/closed ===== */
+function aaLoadNotifications(force){
+  if(window._aaNotifLoaded && !force) return;
+  if(window._aaNotifLoading) return;
+  window._aaNotifLoading=true;
+  var done=0, need=3;
+  var loans=[], accounts=[], colls=[];
+  function finish(){
+    done++;
+    if(done<need) return;
+    var active=0, closed=0;
+    var nameByAcc={}, nameByCust={};
+    accounts.forEach(function(a){
+      var st=String(a.ACCOUNT_STATUS||"ACTIVE").toUpperCase();
+      if(st==="CLOSED"||st==="BLOCKED") closed++; else active++;
+      if(a.ACCOUNT_NO) nameByAcc[String(a.ACCOUNT_NO)]=a.ACCOUNT_NAME||a.ACCOUNT_NO;
+      if(a.CUSTOMER_ID) nameByCust[String(a.CUSTOMER_ID)]=a.ACCOUNT_NAME||"";
+    });
+
+    // Active loans list
+    var activeLoans=[];
+    loans.forEach(function(L){
+      var st=String(L.LOAN_STATUS||"").toUpperCase();
+      if(st==="REJECTED"||st==="CLOSED") return;
+      var acc=L.ACCOUNT_NO||L.LOAN_ACCOUNT_NO||"";
+      var nm=nameByAcc[String(acc)]||nameByCust[String(L.CUSTOMER_ID)]||L.CUSTOMER_ID||"—";
+      activeLoans.push({
+        name:nm, account:acc, loan:L.LOAN_ACCOUNT_NO||L.APPLICATION_ID||"",
+        amount:parseFloat(L.EMI_AMOUNT)||parseFloat(L.LOAN_AMOUNT)||0,
+        outstanding:parseFloat(L.OUTSTANDING_PRINCIPAL)||parseFloat(L.LOAN_AMOUNT)||0,
+        status:L.LOAN_STATUS||"ACTIVE"
+      });
+    });
+
+    // Collection frequency lists from ACCOUNT_MASTER types / products if available
+    // Prefer: accounts with DAILY/WEEKLY/MONTHLY deposit products + expected amount from RD/daily dep masters
+    // Fallback: group recent collection patterns OR list savings accounts by type tags
+    var dailyList=[], weeklyList=[], monthlyList=[];
+    // From ACCOUNT_MASTER ACCOUNT_TYPE / ACCOUNT_NAME hints
+    accounts.forEach(function(a){
+      var st=String(a.ACCOUNT_STATUS||"ACTIVE").toUpperCase();
+      if(st==="CLOSED"||st==="BLOCKED") return;
+      var typ=String(a.ACCOUNT_TYPE||"").toUpperCase();
+      var nm=a.ACCOUNT_NAME||"—";
+      var acc=a.ACCOUNT_NO||"";
+      var bal=parseFloat(a.CURRENT_BALANCE)||0;
+      // Also check MIN_BALANCE / INTEREST as weak amount signal — better: use last collection amount
+      var item={name:nm, account:acc, amount:bal, type:typ};
+      if(typ.indexOf("DAILY")>=0) dailyList.push(item);
+      else if(typ.indexOf("WEEKLY")>=0) weeklyList.push(item);
+      else if(typ.indexOf("MONTHLY")>=0 || typ.indexOf("RD")>=0) monthlyList.push(item);
+    });
+
+    // Enrich amounts from recent collections (last known amount per account+type)
+    var lastAmt={};
+    colls.forEach(function(c){
+      var acc=String(c.ACCOUNT_NO||"");
+      var t=String(c.COLLECTION_TYPE||"").toUpperCase();
+      var key=acc+"|"+t;
+      if(!lastAmt[key]) lastAmt[key]=parseFloat(c.AMOUNT)||0;
+    });
+    function applyLast(list, typeKey){
+      list.forEach(function(it){
+        var k=it.account+"|"+typeKey;
+        if(lastAmt[k]) it.amount=lastAmt[k];
+      });
+    }
+    applyLast(dailyList,"DAILY"); applyLast(weeklyList,"WEEKLY"); applyLast(monthlyList,"MONTHLY");
+
+    // If no type-tagged accounts, show members with any deposit history under Daily as due candidates
+    if(!dailyList.length && !weeklyList.length && !monthlyList.length){
+      var seen={};
+      colls.forEach(function(c){
+        var acc=String(c.ACCOUNT_NO||"");
+        if(!acc||seen[acc]) return;
+        seen[acc]=1;
+        var t=String(c.COLLECTION_TYPE||"").toUpperCase();
+        var item={name:nameByAcc[acc]||c.ACCOUNT_NAME||c.CUSTOMER_ID||"—", account:acc, amount:parseFloat(c.AMOUNT)||0};
+        if(t.indexOf("WEEKLY")>=0) weeklyList.push(item);
+        else if(t.indexOf("MONTHLY")>=0) monthlyList.push(item);
+        else dailyList.push(item);
+      });
+    }
+
+    
+    var allAccounts=[];
+    accounts.forEach(function(a){
+      allAccounts.push({name:a.ACCOUNT_NAME||"—", account:a.ACCOUNT_NO||"", status:a.ACCOUNT_STATUS||"ACTIVE"});
+    });
+    // sort active first
+    allAccounts.sort(function(a,b){
+      var aa=String(a.status).toUpperCase()==="ACTIVE"?0:1;
+      var bb=String(b.status).toUpperCase()==="ACTIVE"?0:1;
+      return aa-bb || String(a.name).localeCompare(String(b.name));
+    });
+    window._aaNotif={loans:activeLoans, daily:dailyList, weekly:weeklyList, monthly:monthlyList, active:active, closed:closed, all:allAccounts};
+
+
+    // Stats header
+    document.getElementById("aa-stat-active").textContent=String(active);
+    document.getElementById("aa-stat-closed").textContent=String(closed);
+    document.getElementById("aa-alert-active").textContent=String(active);
+    document.getElementById("aa-alert-closed").textContent=String(closed);
+    document.getElementById("aa-alert-loans").textContent=String(activeLoans.length);
+
+    // Alerts tab lists
+    paintList("aa-all-list","aa-all-count", allAccounts, function(x){
+      return '<div class="aa-list-item"><div><div class="nm">'+esc(x.name)+'</div>'
+        +'<div class="meta">'+esc(x.account)+'</div></div></div>';
+    });
+    paintList("aa-loan-list","aa-loan-count", activeLoans, function(x){
+      return '<div class="aa-list-item"><div><div class="nm">'+esc(x.name)+'</div>'
+        +'<div class="meta">'+esc(x.account||x.loan)+'</div></div></div>';
+    });
+    paintList("aa-daily-list","aa-daily-count", dailyList, personRow);
+    paintList("aa-weekly-list","aa-weekly-count", weeklyList, personRow);
+    paintList("aa-monthly-list","aa-monthly-count", monthlyList, personRow);
+
+    // Badge on bell
+    var n = activeLoans.length + dailyList.length + weeklyList.length + monthlyList.length;
+    var bdg=document.getElementById("aa-notif-bdg");
+    if(n>0){ bdg.style.display="flex"; bdg.textContent=String(n>99?99:n); }
+    else bdg.style.display="none";
+
+    window._aaNotifLoaded=true;
+    window._aaNotifLoading=false;
+    // Notif panel body
+    renderNotifPanel();
+  }
+
+  function personRow(x){
+    return '<div class="aa-list-item"><div><div class="nm">'+esc(x.name)+'</div>'
+      +'<div class="meta">'+esc(x.account)+'</div></div></div>';
+  }
+  function paintList(bodyId, countId, arr, rowFn){
+    var el=document.getElementById(bodyId);
+    var ct=document.getElementById(countId);
+    if(ct) ct.textContent=String(arr.length);
+    if(!arr.length){ el.innerHTML='<div class="aa-empty">No records</div>'; return; }
+    el.innerHTML=arr.map(rowFn).join("");
+  }
+  function esc(s){ return String(s||"").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  postGAS({action:"get_list", sheet:"LOAN_REGISTRATION_MASTER", limit:400}).then(function(r){ loans=(r&&r.rows)||[]; finish(); });
+  postGAS({action:"get_list", sheet:"ACCOUNT_MASTER", limit:800}).then(function(r){ accounts=(r&&r.rows)||[]; finish(); });
+  postGAS({action:"get_list", sheet:"DAILY_COLLECTION_MASTER", limit:500}).then(function(r){ colls=(r&&r.rows)||[]; finish(); });
+}
+
+function renderNotifPanel(){
+  var N=window._aaNotif||{};
+  var html="";
+  html+='<div class="aa-sec"><div class="aa-sec-h">Accounts</div>';
+  html+='<div class="aa-list-item"><span>Active Accounts</span><span class="amt">'+((N.active)||0)+'</span></div>';
+  html+='<div class="aa-list-item" style="border-bottom:none"><span>Closed Accounts</span><span class="amt" style="color:var(--er)">'+(N.closed||0)+'</span></div></div>';
+
+  function sec(title, arr, badge){
+    html+='<div class="aa-sec"><div class="aa-sec-h">'+title+' <span class="aa-badge '+badge+'">'+(arr||[]).length+'</span></div>';
+    if(!(arr&&arr.length)){ html+='<div class="aa-empty">No records</div></div>'; return; }
+    arr.forEach(function(x){
+      html+='<div class="aa-list-item"><div><div class="nm">'+String(x.name||"—").replace(/</g,"")+'</div>'
+        +'<div class="meta">'+String(x.account||x.loan||"")+'</div></div></div>';
+    });
+    html+='</div>';
+  }
+  sec("All Accounts", N.all, "ok");
+  sec("Loan Accounts", N.loans, "info");
+  sec("Daily Collection", N.daily, "warn");
+  sec("Weekly Collection", N.weekly, "warn");
+  sec("Monthly Collection", N.monthly, "warn");
+  document.getElementById("aa-notif-body").innerHTML=html;
+}
+
+function aaOpenNotif(){
+  aaLoadNotifications(true);
+  document.getElementById("aa-notif").classList.add("show");
+}
+function aaCloseNotif(){ document.getElementById("aa-notif").classList.remove("show"); }
+
+function aaPrintDaySheet(){
+  var rows=window._aaList||[];
+  var agent=session.name||session.agentId||"";
+  var date=document.getElementById("aa_DATE").value||"";
+  var total=0; rows.forEach(function(x){ total+=parseFloat(x.AMOUNT)||0; });
+  var w=window.open("","_blank");
+  if(!w){ aaToast("Allow popups"); return; }
+  var body=rows.map(function(x,i){
+    return "<tr><td>"+(i+1)+"</td><td>"+(x.ACCOUNT_NO||"")+"</td><td>"+(x.ACCOUNT_NAME||"")+"</td><td>"+(x.COLLECTION_TYPE||"")+"</td><td style='text-align:right'>"+Number(x.AMOUNT||0).toLocaleString("en-IN")+"</td></tr>";
+  }).join("");
+  w.document.write("<html><head><meta name='viewport' content='width=device-width'><title>Day Sheet</title><style>body{font-family:Segoe UI,sans-serif;padding:12px}h1{color:#8B1538;font-size:14px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #e8d0d5;padding:6px}th{background:#8B1538;color:#fff}</style></head><body>");
+  w.document.write("<h1>Shree Radha Credit Co-operative Society Ltd. — Agent Day Sheet</h1>");
+  w.document.write("<p>Agent: <b>"+agent+"</b> | Date: <b>"+date+"</b> | Total: <b>₹ "+Number(total).toLocaleString("en-IN")+"</b></p>");
+  w.document.write("<table><thead><tr><th>#</th><th>A/c</th><th>Name</th><th>Type</th><th>Amt</th></tr></thead><tbody>"+body);
+  w.document.write("<tr style='font-weight:700;background:#F5E6EA'><td colspan='4'>TOTAL</td><td style='text-align:right'>"+Number(total).toLocaleString("en-IN")+"</td></tr></tbody></table>");
+  w.document.write("<script>window.print()<\/script></body></html>");
+  w.document.close();
+}
+
+document.getElementById("loginPass").addEventListener("keydown", function(e){ if(e.key==="Enter") doAgentLogin(); });
 </script>
 </body>
 </html>
